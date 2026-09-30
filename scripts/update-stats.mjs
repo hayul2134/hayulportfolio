@@ -40,7 +40,12 @@ async function tiktok() {
 }
 
 async function instagram() {
-  try { // 1순위: 공개 프로필 API
+  try { // 1순위: Cloudflare 함수(/api/ig) 경유 — GitHub 서버 IP는 인스타가 자주 차단함
+    const j = JSON.parse(await get('https://hayulportfolio.pages.dev/api/ig', { accept: 'application/json' }));
+    if (typeof j.followers === 'number') return { followers: j.followers, posts: j.posts };
+    throw new Error(j.error || 'no data');
+  } catch (e) { console.log('instagram (cloudflare) 실패:', e.message); }
+  try { // 2순위: 공개 프로필 API
     const j = JSON.parse(await get('https://www.instagram.com/api/v1/users/web_profile_info/?username=hayul2050',
       { 'x-ig-app-id': '936619743392459', accept: 'application/json' }));
     const u = j.data.user;
