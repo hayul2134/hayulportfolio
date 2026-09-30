@@ -122,7 +122,9 @@
 
   .steps { list-style:none; margin:0 0 56px; padding:0; display:grid; }
   @media (min-width:720px) { .steps { grid-template-columns:repeat(4,1fr); column-gap:24px; } }
-  .steps li { border-top:1px solid var(--line); padding:18px 0 26px; }
+  .steps { gap:14px; }
+  .steps li { padding:20px 20px 24px; }
+  @media (max-width:719px) { .steps { gap:12px; } }
   .steps .q { display:block; font-family:var(--mono); font-size:.78rem; color:var(--accent); margin-bottom:8px; }
   .steps h3 { font-size:1.2rem; letter-spacing:-0.025em; margin:0 0 4px; }
   .steps p { margin:0; color:var(--sub); word-break:keep-all; }
@@ -130,12 +132,46 @@
   /* 02 소개 */
   .split { display:grid; gap:0; }
   @media (min-width:900px) { .split { grid-template-columns:200px 1fr; column-gap:48px; } .split > .label { position:sticky; top:96px; align-self:start; } .split .rule { display:none; } }
-  .career { list-style:none; margin:0; padding:0; border-bottom:1px solid var(--line); }
-  .career li { display:grid; gap:4px 24px; padding:26px 0; border-top:1px solid var(--line); }
-  @media (min-width:720px) { .career li { grid-template-columns:110px 1fr 1.2fr; align-items:baseline; } }
-  .career .when { color:var(--accent); }
-  .career h3 { font-size:clamp(1.15rem,2.4vw,1.5rem); letter-spacing:-0.03em; margin:0; }
-  .career p { margin:0; color:var(--sub); word-break:keep-all; }
+  .role .mono { color:var(--accent); }
+  .role h3 { font-size:clamp(2rem,5.4vw,3.6rem); line-height:1.1; letter-spacing:-0.045em; font-weight:800; margin:6px 0 12px; word-break:keep-all; }
+  .role p { margin:0; color:var(--sub); font-size:clamp(1rem,1.8vw,1.15rem); max-width:36em; word-break:keep-all; }
+  .tools { list-style:none; margin:24px 0 28px; padding:0; display:flex; flex-wrap:wrap; gap:10px; }
+  .tool { display:flex; align-items:center; gap:10px; padding:8px 16px 8px 8px; border-radius:16px; cursor:default; }
+  .tool-ic { display:grid; place-items:center; width:34px; height:34px; border-radius:11px; background:var(--chip); border:1px solid var(--gborder); color:var(--accent); }
+  .tool-ic .ic { width:18px; height:18px; }
+  .tool b { display:block; font-size:.92rem; letter-spacing:-0.01em; line-height:1.2; }
+  .tool small { display:block; font-size:.72rem; color:var(--sub); line-height:1.3; }
+
+  /* 성장 기록 슬라이더 */
+  .tl { padding:clamp(22px,4vw,40px); overflow:hidden; }
+  .tl-body { display:grid; gap:10px 32px; align-items:start; min-height:120px; transition:opacity .35s ease, transform .35s cubic-bezier(.2,.7,.2,1); }
+  .tl-body.swap { opacity:0; transform:translateY(10px); }
+  @media (min-width:640px) { .tl-body { grid-template-columns:auto 1fr; } }
+  .tl-big { font-size:clamp(3.6rem,10vw,6.4rem); font-weight:800; letter-spacing:-0.06em; line-height:.95; white-space:nowrap;
+            background:linear-gradient(120deg,#ffb35c,#ff5f9e 48%,#6c7dff); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .tl-big small { font-size:.34em; letter-spacing:-0.02em; margin-left:4px; -webkit-text-fill-color:var(--fg); color:var(--fg); }
+  .tl-meta { display:flex; align-items:center; gap:12px; margin-bottom:10px; }
+  .tl-tag { font-size:.72rem; font-weight:700; letter-spacing:.12em; padding:6px 14px; border-radius:999px; border:1px solid var(--line); background:var(--chip); }
+  .tl-text h3 { font-size:clamp(1.3rem,2.8vw,1.8rem); letter-spacing:-0.035em; margin:0 0 8px; }
+  .tl-text p { margin:0; color:var(--sub); word-break:keep-all; max-width:40em; }
+  .tl-track { position:relative; margin:30px 0 0; padding-bottom:48px; }
+  .tl-range { -webkit-appearance:none; appearance:none; display:block; width:100%; height:40px; margin:0; background:transparent; cursor:pointer; position:relative; z-index:1; }
+  .tl-range:focus-visible { outline:2px solid var(--accent); outline-offset:6px; border-radius:999px; }
+  .tl-range::-webkit-slider-runnable-track { height:10px; border-radius:999px; background:var(--clip); }
+  .tl-range::-moz-range-track { height:10px; border-radius:999px; background:var(--clip); }
+  .tl-range::-webkit-slider-thumb { -webkit-appearance:none; width:64px; height:40px; margin-top:-15px; border-radius:999px; border:0;
+    background:linear-gradient(180deg,#fff,#eef0f6); box-shadow:0 6px 18px rgba(20,24,60,.28), inset 0 1px 0 #fff; transition:transform .3s cubic-bezier(.2,.7,.2,1); }
+  .tl-range::-moz-range-thumb { width:64px; height:40px; border-radius:999px; border:0; background:linear-gradient(180deg,#fff,#eef0f6); box-shadow:0 6px 18px rgba(20,24,60,.28); transition:transform .3s cubic-bezier(.2,.7,.2,1); }
+  .tl-range:hover::-webkit-slider-thumb, .tl-range:active::-webkit-slider-thumb { transform:scale(1.08); }
+  .tl-range:hover::-moz-range-thumb { transform:scale(1.08); }
+  .tl-dots, .tl-labels { position:absolute; left:32px; right:32px; }
+  .tl-dots { top:17px; height:6px; pointer-events:none; }
+  .tl-dots i { position:absolute; top:0; width:6px; height:6px; margin-left:-3px; border-radius:50%; background:var(--sub); opacity:.6; }
+  .tl-labels { top:52px; }
+  .tl-labels button { position:absolute; transform:translateX(-50%); border:0; background:none; padding:4px 8px; border-radius:8px; cursor:pointer;
+                      font-size:.9rem; font-weight:600; color:var(--sub); white-space:nowrap; }
+  .tl-labels button.on { color:var(--fg); }
+  .tl-hint { margin:4px 0 0; font-size:.85rem; color:var(--sub); }
 
   /* 03 연락처 */
   .big { font-size:clamp(2.2rem,7.4vw,5.6rem); line-height:1.12; letter-spacing:-0.05em; font-weight:800; margin:0 0 clamp(36px,6vw,64px); word-break:keep-all; }
@@ -163,7 +199,6 @@
   .chs { display:grid; gap:16px; }
   @media (min-width:860px) { .chs { grid-template-columns:1.3fr 1fr 1fr; } }
   .ch { display:flex; flex-direction:column; gap:26px; padding:22px 22px 24px; transition:transform .3s cubic-bezier(.2,.7,.2,1), box-shadow .3s; }
-  .ch:hover { transform:translateY(-4px); }
   .ch-top { display:flex; align-items:center; gap:12px; }
   .ch-ic { display:grid; place-items:center; width:44px; height:44px; flex:none; border-radius:14px; background:var(--chip); border:1px solid var(--gborder); }
   .ch-ic .ic { width:22px; height:22px; }
@@ -189,28 +224,25 @@
   .bk-week, .bk-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:6px; }
   .bk-week span { text-align:center; font-size:.78rem; color:var(--sub); padding:4px 0 8px; }
   .bk-week span:first-child { color:#e0534a; }
-  .day { position:relative; height:clamp(44px,7vw,60px); border:1px solid transparent; border-radius:14px; background:transparent; cursor:pointer;
-         display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; font-size:clamp(.9rem,2vw,1.05rem); font-weight:600;
-         transition:background .2s, border-color .2s, transform .2s, color .2s; }
-  .day:hover:not(:disabled) { background:var(--chip); border-color:var(--gborder); }
-  .day i { width:5px; height:5px; border-radius:50%; background:transparent; }
-  .day.free i { background:var(--accent); opacity:.55; }
-  .day.busy { color:var(--sub); cursor:not-allowed; }
-  .day.busy i { background:var(--sub); opacity:.7; width:14px; height:3px; border-radius:2px; }
-  .day.past { opacity:.28; cursor:default; }
-  .day.today { border-color:var(--line); }
-  .day.sel, .day.sel:hover:not(:disabled) { background:var(--accent); color:#fff; border-color:transparent; box-shadow:0 6px 18px var(--glow); transform:scale(1.04); }
-  .day.sel i { background:#fff; opacity:.9; }
+  .day { position:relative; height:clamp(42px,7vw,58px); border-radius:14px; cursor:pointer; font-size:clamp(.9rem,2vw,1.05rem); font-weight:600;
+         display:flex; align-items:center; justify-content:center; border:1px solid var(--gborder);
+         background:linear-gradient(135deg,var(--ga),var(--gb)); box-shadow:0 2px 10px rgba(30,40,90,.06), inset 0 1px 0 var(--ghi);
+         transition:scale .35s cubic-bezier(.2,.7,.2,1), background .25s, color .25s, box-shadow .3s, border-color .25s; }
+  .day i { display:none; }
+  .day.free:hover { scale:1.1; z-index:1; box-shadow:var(--gshadow), inset 0 1px 0 var(--ghi); }
+  .day.busy { cursor:not-allowed; color:var(--sub); background:var(--clip2); border-color:transparent; box-shadow:none; opacity:.75; }
+  .day.past { cursor:default; opacity:.3; background:transparent; border-color:var(--line); box-shadow:none; }
+  .day.today { border-color:var(--accent); }
+  .day.sel, .day.sel:hover { background:var(--accent); color:#fff; border-color:transparent; box-shadow:0 8px 22px var(--glow), inset 0 1px 0 rgba(255,255,255,.35); scale:1.06; }
   .bk-foot { display:flex; flex-wrap:wrap; gap:8px 18px; align-items:center; margin:14px 0 0; font-size:.82rem; color:var(--sub); }
   .bk-foot .lg { display:inline-flex; align-items:center; gap:7px; }
-  .bk-foot .lg i { width:7px; height:7px; border-radius:50%; background:var(--accent); opacity:.7; }
-  .bk-foot .lg i.b { width:14px; height:3px; border-radius:2px; background:var(--sub); }
+  .bk-foot .lg i { width:14px; height:14px; border-radius:5px; border:1px solid var(--gborder); background:linear-gradient(135deg,var(--ga),var(--gb)); box-shadow:inset 0 1px 0 var(--ghi); }
+  .bk-foot .lg i.b { background:var(--clip2); border-color:transparent; box-shadow:none; }
   .bk-foot #calStatus { margin-left:auto; font-size:.7rem; }
   .bk-pick { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:12px; margin-top:18px; padding-top:18px; border-top:1px solid var(--line); }
   .bk-pick span { font-weight:600; letter-spacing:-0.02em; }
   .btn-glass { display:inline-flex; align-items:center; gap:10px; min-height:48px; padding:0 22px; border-radius:999px; font-weight:600; cursor:pointer;
                background:var(--accent); color:#fff; box-shadow:0 8px 24px var(--glow), inset 0 1px 0 rgba(255,255,255,.35); transition:transform .2s, opacity .2s, box-shadow .2s; }
-  .btn-glass:hover { transform:translateY(-2px); }
   .btn-glass[aria-disabled="true"] { opacity:.35; pointer-events:none; box-shadow:none; }
   .btn-glass .ic { width:18px; height:18px; }
 
@@ -222,13 +254,22 @@
   .mail-btn span { overflow-wrap:anywhere; }
   .mail-btn .ic { width:24px; height:24px; flex:none; }
   .mail-btn .ic.arr { width:20px; height:20px; color:var(--sub); transition:transform .25s, color .2s; }
-  .mail-btn:hover { color:var(--accent); transform:translateY(-2px); }
+  .mail-btn:hover { color:var(--accent); }
   .mail-btn:hover .ic.arr { color:var(--accent); transform:translate(3px,-3px); }
+  /* 마우스를 올리면 해당 요소만 살짝 커졌다가, 떼면 원래 크기로 */
+  .nav a, .theme-btn, .bk-nav, .btn-glass, .mail-btn, .copy, .tl-labels button, .logo {
+    transition-property:color, background, background-color, border-color, box-shadow, opacity, scale;
+    transition-duration:.35s; transition-timing-function:cubic-bezier(.2,.7,.2,1); }
+  .nav a:hover, .copy:hover, .tl-labels button:hover, .logo:hover { scale:1.06; }
+  .theme-btn:hover, .bk-nav:hover:not(:disabled) { scale:1.1; }
+  .btn-glass:hover, .mail-btn:hover { scale:1.04; }
+  .ch:hover, .steps li:hover { scale:1.025; }
+  .tool:hover { scale:1.06; }
   .end { height:clamp(72px,12vw,140px); }
 
   /* 스크롤할 때마다 아래에서 위로 등장 (올렸다 내려도 반복) */
-  .js .reveal { opacity:0; transform:translateY(28px); transition:opacity .8s cubic-bezier(.2,.7,.2,1), transform .8s cubic-bezier(.2,.7,.2,1); }
-  .js .reveal.in { opacity:1; transform:none; transition-delay:var(--d,0s); }
+  .js .reveal { opacity:0; transform:translateY(28px); transition:opacity .8s cubic-bezier(.2,.7,.2,1), transform .8s cubic-bezier(.2,.7,.2,1), scale .4s cubic-bezier(.2,.7,.2,1), box-shadow .3s, color .2s; }
+  .js .reveal.in { opacity:1; transform:none; transition-delay:var(--d,0s), var(--d,0s), 0s, 0s, 0s; }
   .js .ln > span { display:block; transform:translateY(105%); transition:transform .9s cubic-bezier(.2,.7,.2,1); }
   .js .ln.in > span { transform:none; transition-delay:var(--d,0s); }
   .js .rule { transform:scaleX(0); transition:transform .9s cubic-bezier(.2,.7,.2,1); }
@@ -248,6 +289,10 @@
   <symbol id="i-video" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="4"/><path d="M10 9.2v5.6l4.6-2.8z"/></symbol>
   <symbol id="i-camera" viewBox="0 0 24 24"><path d="M4 8.5A2.5 2.5 0 0 1 6.5 6h1.8l1.4-2h4.6l1.4 2h1.8A2.5 2.5 0 0 1 20 8.5v8a2.5 2.5 0 0 1-2.5 2.5h-11A2.5 2.5 0 0 1 4 16.5z"/><circle cx="12" cy="12.5" r="3.4"/></symbol>
   <symbol id="i-note" viewBox="0 0 24 24"><path d="M9 18V5l11-2v13"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="17.5" cy="16" r="2.5"/></symbol>
+  <symbol id="i-film" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M7 4v16M17 4v16M3 9h4M3 15h4M17 9h4M17 15h4"/></symbol>
+  <symbol id="i-image" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="9" cy="10" r="1.8"/><path d="m4 18 5.5-5 4 3.5 3-2.5L20 17"/></symbol>
+  <symbol id="i-motion" viewBox="0 0 24 24"><path d="M12 3.5 15.5 7 12 10.5 8.5 7z"/><path d="M4 17c3-5 6-5 8-2s5 3 8-2"/></symbol>
+  <symbol id="i-color" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 3.5v17M12 12l7.4 4.2M12 12 4.6 16.2"/></symbol>
   <symbol id="i-mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="m4 7 8 6 8-6"/></symbol>
   <symbol id="i-left" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></symbol>
   <symbol id="i-right" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></symbol>
@@ -296,10 +341,10 @@
     <div class="rule"></div>
     <p class="note reveal">편집은 이렇게 진행합니다.</p>
     <ol class="steps">
-      <li class="reveal" style="--d:0s"><span class="q">01</span><h3>의도 파악</h3><p>영상의 의도와 목적을 먼저 파악합니다.</p></li>
-      <li class="reveal" style="--d:.12s"><span class="q">02</span><h3>취사선택</h3><p>무엇을 남기고 무엇을 덜어낼지 정합니다.</p></li>
-      <li class="reveal" style="--d:.24s"><span class="q">03</span><h3>구성</h3><p>순서와 호흡, 리듬, 전환을 설계합니다.</p></li>
-      <li class="reveal" style="--d:.36s"><span class="q">04</span><h3>완성</h3><p>최종적인 영상 언어로 다듬어 마무리합니다.</p></li>
+      <li class="glass reveal" style="--d:0s"><span class="q">01</span><h3>의도 파악</h3><p>영상의 의도와 목적을 먼저 파악합니다.</p></li>
+      <li class="glass reveal" style="--d:.12s"><span class="q">02</span><h3>취사선택</h3><p>무엇을 남기고 무엇을 덜어낼지 정합니다.</p></li>
+      <li class="glass reveal" style="--d:.24s"><span class="q">03</span><h3>구성</h3><p>순서와 호흡, 리듬, 전환을 설계합니다.</p></li>
+      <li class="glass reveal" style="--d:.36s"><span class="q">04</span><h3>완성</h3><p>최종적인 영상 언어로 다듬어 마무리합니다.</p></li>
     </ol>
     <!-- 작업이 준비되면 article 하나를 작업 하나로 교체하세요: 번호, 제목, 분야·연도, 내 역할, 링크 -->
     <div class="frames reveal-group">
@@ -312,12 +357,36 @@
   <section class="sec split" id="about">
     <h2 class="label reveal"><span class="no">02</span>소개</h2>
     <div class="rule"></div>
-    <!-- 커리어가 늘면 li 하나를 복사해 위에 추가하세요: 기간, 역할, 설명 -->
-    <ol class="career">
-      <li class="reveal" style="--d:0s"><span class="when mono">현재</span><h3>영상 편집자</h3><p>여러 클라이언트와 협업하며 영상을 편집합니다.</p></li>
-      <li class="reveal" style="--d:.1s"><span class="when mono">현재</span><h3>'호영 Shorts' 채널 담당</h3><p>본업으로 유튜브 쇼츠 채널을 맡고 있습니다.</p></li>
-      <li class="reveal" style="--d:.2s"><span class="when mono">현재</span><h3>개인 채널 '하율' 운영</h3><p>나만의 콘텐츠를 만들며 실력을 쌓고 있습니다.</p></li>
-    </ol>
+    <div class="about">
+      <div class="role reveal">
+        <span class="mono">Video Editor</span>
+        <h3>영상 편집자, 하율</h3>
+        <p>여러 클라이언트와 협업하며 영상을 편집합니다. 영상의 의도와 목적을 먼저 읽고, 무엇을 남기고 덜어낼지 판단해 하나의 흐름으로 완성합니다.</p>
+      </div>
+      <ul class="tools reveal" aria-label="사용 프로그램">
+        <li class="tool glass"><span class="tool-ic"><svg class="ic"><use href="#i-film"/></svg></span><span><b>Premiere Pro</b><small>영상 편집</small></span></li>
+        <li class="tool glass"><span class="tool-ic"><svg class="ic"><use href="#i-image"/></svg></span><span><b>Photoshop</b><small>이미지·썸네일</small></span></li>
+        <li class="tool glass"><span class="tool-ic"><svg class="ic"><use href="#i-motion"/></svg></span><span><b>After Effects</b><small>모션 그래픽</small></span></li>
+        <li class="tool glass"><span class="tool-ic"><svg class="ic"><use href="#i-color"/></svg></span><span><b>DaVinci Resolve</b><small>편집·색보정</small></span></li>
+      </ul>
+      <!-- 성장 기록은 아래 스크립트의 TL 목록에 한 줄씩 추가하면 슬라이더에 자동 반영 -->
+      <div class="tl glass reveal" id="tl">
+        <div class="tl-body" id="tlBody" aria-live="polite">
+          <div class="tl-big" id="tlBig"></div>
+          <div class="tl-text">
+            <div class="tl-meta"><span class="tl-tag" id="tlTag"></span><span class="mono" id="tlWhen"></span></div>
+            <h3 id="tlTitle"></h3>
+            <p id="tlDesc"></p>
+          </div>
+        </div>
+        <div class="tl-track">
+          <div class="tl-dots" id="tlDots"></div>
+          <input class="tl-range" type="range" id="tlRange" min="0" max="1" step="1" value="0" aria-label="성장 기록 시점 선택">
+          <div class="tl-labels" id="tlLabels"></div>
+        </div>
+        <p class="tl-hint">슬라이더를 움직여 하율의 성장 기록을 확인해 보세요.</p>
+      </div>
+    </div>
   </section>
 
   <section class="sec aura" id="channel">
@@ -345,7 +414,7 @@
     <h2 class="label reveal"><span class="no">04</span>문의</h2>
     <div class="rule"></div>
     <p class="big"><span class="ln" style="--d:0s"><span>함께할 일이 있다면</span></span><span class="ln" style="--d:.12s"><span>편하게 연락 주세요.</span></span></p>
-    <p class="note reveal">달력에서 원하는 날짜를 고르면, 그 날짜가 적힌 문의 메일을 바로 보낼 수 있습니다.</p>
+    <p class="note reveal">작업 시작을 희망하시는 날짜를 선택해 주시면, 해당 날짜가 기재된 문의 메일을 바로 보내실 수 있습니다.</p>
     <div class="bk glass reveal" id="booking">
       <div class="bk-head">
         <button class="bk-nav" type="button" id="calPrev" aria-label="이전 달"><svg><use href="#i-left"/></svg></button>
@@ -354,7 +423,7 @@
       </div>
       <div class="bk-week" aria-hidden="true"><span>일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span>토</span></div>
       <div class="bk-grid" id="calGrid"></div>
-      <div class="bk-foot"><span class="lg"><i></i>문의 가능</span><span class="lg"><i class="b"></i>일정 있음</span><span class="mono" id="calStatus"></span></div>
+      <div class="bk-foot"><span class="lg"><i></i>문의 가능</span><span class="lg"><i class="b"></i>일정 있음 (선택 불가)</span><span class="mono" id="calStatus"></span></div>
       <div class="bk-pick">
         <span id="pickText">원하는 날짜를 선택해 주세요.</span>
         <a class="btn-glass" id="pickBtn" href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=officialhayul@gmail.com&amp;su=%EB%AC%B8%EC%9D%98%EB%93%9C%EB%A6%BD%EB%8B%88%EB%8B%A4" target="_blank" rel="noopener" aria-disabled="true"><svg class="ic"><use href="#i-mail"/></svg>이 날짜로 문의하기</a>
@@ -391,6 +460,41 @@
     root.setAttribute('data-theme', e.matches ? 'dark' : 'light'); label();
   };
   if (mq.addEventListener) mq.addEventListener('change', onSys);
+
+  // 성장 기록 슬라이더 — 새 기록은 TL 목록에 시간 순서대로 추가
+  (function () {
+    var TL = [
+      { label: '2026.05', big: '2026', sub: '.05', tag: 'CHANNEL', when: '2026년 5월', title: "개인 채널 '하율' 개설", desc: '나만의 콘텐츠를 만들며 실력을 쌓기 시작했습니다.' },
+      { label: '현재', big: 'NOW', sub: '', tag: 'EDITOR', when: '현재', title: '영상 편집자', desc: '여러 클라이언트와 협업하며 영상을 편집하고 있습니다.' }
+    ];
+    var range = document.getElementById('tlRange'), body = document.getElementById('tlBody');
+    var dots = document.getElementById('tlDots'), labels = document.getElementById('tlLabels'), cur = -1, t;
+    range.max = TL.length - 1;
+    TL.forEach(function (it, i) {
+      var pos = TL.length > 1 ? (i / (TL.length - 1) * 100) + '%' : '0%';
+      var d = document.createElement('i'); d.style.left = pos; dots.appendChild(d);
+      var b = document.createElement('button'); b.type = 'button'; b.textContent = it.label; b.style.left = pos;
+      b.addEventListener('click', function () { range.value = i; show(i); }); labels.appendChild(b);
+    });
+    function fill(i) {
+      var it = TL[i];
+      document.getElementById('tlBig').innerHTML = it.big + (it.sub ? '<small>' + it.sub + '</small>' : '');
+      document.getElementById('tlTag').textContent = it.tag;
+      document.getElementById('tlWhen').textContent = it.when;
+      document.getElementById('tlTitle').textContent = it.title;
+      document.getElementById('tlDesc').textContent = it.desc;
+      [].forEach.call(labels.children, function (b, k) { b.classList.toggle('on', k === i); });
+    }
+    function show(i) {
+      i = +i; if (i === cur) return;
+      var first = cur < 0; cur = i;
+      if (first || still0) { fill(i); return; }
+      body.classList.add('swap'); clearTimeout(t);
+      t = setTimeout(function () { fill(i); body.classList.remove('swap'); }, 220);
+    }
+    range.addEventListener('input', function () { show(range.value); });
+    show(0);
+  })();
 
   // 채널 수치: stats.json(매일 00:00 KST 갱신)을 읽어 반올림 표시
   (function () {
@@ -436,7 +540,7 @@
       for (var i = 0; i < lead; i++) grid.appendChild(document.createElement('span'));
       for (var d = 1; d <= n; d++) {
         var dt = new Date(view.getFullYear(), view.getMonth(), d), k = key(dt), b = document.createElement('button');
-        b.type = 'button'; b.className = 'day'; b.innerHTML = d + '<i></i>'; b.dataset.k = k;
+        b.type = 'button'; b.className = 'day'; b.textContent = d; b.dataset.k = k;
         if (dt < today) { b.classList.add('past'); b.disabled = true; b.setAttribute('aria-label', label(dt) + ' 지난 날짜'); }
         else if (busy[k]) { b.classList.add('busy'); b.setAttribute('aria-disabled', 'true'); b.setAttribute('aria-label', label(dt) + ' 일정 있음'); }
         else { b.classList.add('free'); b.setAttribute('aria-label', label(dt) + ' 문의 가능'); }
