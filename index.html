@@ -142,9 +142,23 @@
   .tool b { display:block; font-size:.92rem; letter-spacing:-0.01em; line-height:1.2; }
   .tool small { display:block; font-size:.72rem; color:var(--sub); line-height:1.3; }
 
+  .wins { list-style:none; margin:26px 0 0; padding:0; display:grid; grid-template-columns:repeat(2,1fr); gap:12px; }
+  @media (min-width:860px) { .wins { grid-template-columns:repeat(4,1fr); } }
+  .win { padding:18px 18px 16px; display:flex; flex-direction:column; gap:4px; }
+  .win em { font-style:normal; font-weight:800; font-size:clamp(1.6rem,3.6vw,2.3rem); letter-spacing:-0.045em; line-height:1.05;
+            background:linear-gradient(120deg,#ffb35c,#ff5f9e 48%,#6c7dff); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .win em small { font-size:.55em; }
+  .win span { color:var(--sub); font-size:.84rem; word-break:keep-all; }
+  .acts { margin-top:28px; }
+  .acts .mono { color:var(--accent); }
+  .acts ul { list-style:none; margin:12px 0 0; padding:0; display:flex; flex-wrap:wrap; gap:10px; }
+  .act { padding:10px 16px; border-radius:14px; font-size:.92rem; }
+  .act b { font-weight:600; letter-spacing:-0.01em; }
+  .win:hover, .act:hover { scale:1.04; }
+
   /* 성장 기록 슬라이더 */
   .tl { padding:clamp(22px,4vw,40px); overflow:hidden; }
-  .tl-body { display:grid; gap:10px 32px; align-items:start; min-height:120px; transition:opacity .35s ease, transform .35s cubic-bezier(.2,.7,.2,1); }
+  .tl-body { display:grid; gap:10px 32px; align-items:start; min-height:150px; transition:opacity .35s ease, transform .35s cubic-bezier(.2,.7,.2,1); }
   .tl-body.swap { opacity:0; transform:translateY(10px); }
   @media (min-width:640px) { .tl-body { grid-template-columns:auto 1fr; } }
   .tl-big { font-size:clamp(3.6rem,10vw,6.4rem); font-weight:800; letter-spacing:-0.06em; line-height:.95; white-space:nowrap;
@@ -171,6 +185,8 @@
   .tl-labels button { position:absolute; transform:translateX(-50%); border:0; background:none; padding:4px 8px; border-radius:8px; cursor:pointer;
                       font-size:.9rem; font-weight:600; color:var(--sub); white-space:nowrap; }
   .tl-labels button.on { color:var(--fg); }
+  .tl-labels .sh { display:none; }
+  @media (max-width:640px) { .tl-labels button { font-size:.74rem; padding:4px 2px; } .tl-labels .lg { display:none; } .tl-labels .sh { display:inline; } }
   .tl-hint { margin:4px 0 0; font-size:.85rem; color:var(--sub); }
 
   /* 03 연락처 */
@@ -361,8 +377,14 @@
       <div class="role reveal">
         <span class="mono">Video Editor</span>
         <h3>영상 편집자, 하율</h3>
-        <p>여러 클라이언트와 협업하며 영상을 편집합니다. 영상의 의도와 목적을 먼저 읽고, 무엇을 남기고 덜어낼지 판단해 하나의 흐름으로 완성합니다.</p>
+        <p>2024년부터 프리랜서 영상 편집자로 활동하며, MCN 소속 유튜버의 전담 편집자로 약 1년간 일했습니다. 영상의 의도와 목적을 먼저 읽고, 무엇을 남기고 덜어낼지 판단해 하나의 흐름으로 완성합니다.</p>
       </div>
+      <ul class="wins reveal" aria-label="주요 성과">
+        <li class="win glass"><em>600만</em><span>편집한 영상 최고 조회수</span></li>
+        <li class="win glass"><em>1.32만</em><span>직접 키운 숏폼 채널 구독자</span></li>
+        <li class="win glass"><em>2편</em><span>100만 조회수 돌파 영상</span></li>
+        <li class="win glass"><em>1년</em><span>MCN 전담 편집자 경력</span></li>
+      </ul>
       <ul class="tools reveal" aria-label="사용 프로그램">
         <li class="tool glass"><span class="tool-ic"><svg class="ic"><use href="#i-film"/></svg></span><span><b>Premiere Pro</b><small>영상 편집</small></span></li>
         <li class="tool glass"><span class="tool-ic"><svg class="ic"><use href="#i-image"/></svg></span><span><b>Photoshop</b><small>이미지·썸네일</small></span></li>
@@ -385,6 +407,15 @@
           <div class="tl-labels" id="tlLabels"></div>
         </div>
         <p class="tl-hint">슬라이더를 움직여 하율의 성장 기록을 확인해 보세요.</p>
+      </div>
+      <div class="acts reveal">
+        <span class="mono">Leadership · Academic</span>
+        <ul>
+          <li class="act glass"><b>학교 홍보부 편집 부서 부장</b></li>
+          <li class="act glass"><b>학생회 총무부 부장</b></li>
+          <li class="act glass"><b>동아리 부장</b></li>
+          <li class="act glass"><b>전공과목 석차 1·2등 유지</b></li>
+        </ul>
       </div>
     </div>
   </section>
@@ -464,8 +495,18 @@
   // 성장 기록 슬라이더 — 새 기록은 TL 목록에 시간 순서대로 추가
   (function () {
     var TL = [
-      { label: '2026.05', big: '2026', sub: '.05', tag: 'CHANNEL', when: '2026년 5월', title: "개인 채널 '하율' 개설", desc: '나만의 콘텐츠를 만들며 실력을 쌓기 시작했습니다.' },
-      { label: '현재', big: 'NOW', sub: '', tag: 'EDITOR', when: '현재', title: '영상 편집자', desc: '여러 클라이언트와 협업하며 영상을 편집하고 있습니다.' }
+      { label: '~2022', short: '~22', big: '2022', sub: ' 이전', tag: 'START', when: '처음 편집을 시작하다', title: '게임 영상 편집으로 시작',
+        desc: '유튜브에 관심이 많아, 직접 플레이한 게임 영상을 편집해 올리며 편집을 익히기 시작했습니다.' },
+      { label: '2023', short: "'23", big: '2023', sub: '', tag: 'CHANNEL', when: '본격적인 채널 운영', title: '완성도 있는 영상으로 채널 성장',
+        desc: '본격적으로 제대로 된 영상을 편집하며 채널을 키웠습니다.' },
+      { label: '2024', short: "'24", big: '2024', sub: '', tag: 'FREELANCE', when: '프리랜서 편집자', title: '프리랜서 편집자 시작',
+        desc: '유튜브 운영의 한계를 느끼고, 쌓아 온 편집 실력으로 프리랜서를 시작했습니다. 아트머그에서 외주 3건을 진행했고, 직접 메일로 제안해 유튜브 편집 외주 2건(각 약 3개월)을 맡았습니다.' },
+      { label: '2024–25', short: "'24–25", big: '2024', sub: '–25', tag: 'MCN', when: "MCN '애니멀라운지' · 약 1년", title: 'MCN 소속 유튜버 전담 편집자',
+        desc: "아트머그에서 정기 외주로 만난 유튜버 '머어엉'님의 정식 편집자가 되어 약 7개월간 편집을 맡았고, 이어 같은 MCN의 '미담이냥'님 채널을 약 5개월간 편집했습니다. 그중 3개월은 사무실에 출근해 팀과 함께 일했습니다." },
+      { label: '2025', short: "'25", big: '2025', sub: '', tag: 'SHORTS', when: '숏폼 채널 · 대형 채널 편집', title: '숏폼 채널 1.32만 · 최고 600만 조회수',
+        desc: '구독자 약 2천 명이던 숏폼 채널을 맡아 1.32만 명까지 키우고, 100만 조회수를 넘긴 영상 2편을 만들었습니다. 구독자 약 30만 유튜버 호영의 부채널 편집을 맡아 최고 600만 조회수 영상을 만들었습니다.' },
+      { label: '2026.05', short: "'26", big: '2026', sub: '.05', tag: 'CHANNEL', when: '2026년 5월', title: "개인 채널 '하율' 개설", desc: '나만의 콘텐츠를 만들며 실력을 쌓고 있습니다.' },
+      { label: '현재', short: 'NOW', big: 'NOW', sub: '', tag: 'EDITOR', when: '현재', title: '영상 편집자', desc: '여러 클라이언트와 협업하며 영상을 편집하고 있습니다.' }
     ];
     var range = document.getElementById('tlRange'), body = document.getElementById('tlBody');
     var dots = document.getElementById('tlDots'), labels = document.getElementById('tlLabels'), cur = -1, t;
@@ -473,7 +514,7 @@
     TL.forEach(function (it, i) {
       var pos = TL.length > 1 ? (i / (TL.length - 1) * 100) + '%' : '0%';
       var d = document.createElement('i'); d.style.left = pos; dots.appendChild(d);
-      var b = document.createElement('button'); b.type = 'button'; b.textContent = it.label; b.style.left = pos;
+      var b = document.createElement('button'); b.type = 'button'; b.innerHTML = '<span class="lg">' + it.label + '</span><span class="sh">' + (it.short || it.label) + '</span>'; b.setAttribute('aria-label', it.label); b.style.left = pos;
       b.addEventListener('click', function () { range.value = i; show(i); }); labels.appendChild(b);
     });
     function fill(i) {
