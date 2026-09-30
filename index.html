@@ -323,22 +323,22 @@
   <section class="sec aura" id="channel">
     <h2 class="label reveal"><span class="no">03</span>채널</h2>
     <div class="rule"></div>
-    <!-- 숫자는 아래 기준일에 맞춰 직접 수정 -->
+    <!-- 수치는 매일 00:00(KST) GitHub Actions가 stats.json을 갱신하고, 아래 스크립트가 반올림해 표시 -->
     <div class="chs">
       <a class="ch glass reveal" style="--d:0s" href="https://www.youtube.com/channel/UC598o8PwMdyg175uhoe0XvA" target="_blank" rel="noopener" aria-label="유튜브 채널 하율로 이동">
         <span class="ch-top"><span class="ch-ic"><svg class="ic"><use href="#i-video"/></svg></span><span class="ch-name"><b>YouTube</b><small>@하율하율하율</small></span><svg class="ic"><use href="#i-arrow"/></svg></span>
-        <span class="stats"><span><em>232</em><small>구독자</small></span><span><em>8.1만</em><small>총 조회수</small></span><span><em>5</em><small>동영상</small></span></span>
+        <span class="stats"><span><em data-s="youtube.subs">230</em><small>구독자</small></span><span><em data-s="youtube.views">8.1만</em><small>총 조회수</small></span><span><em data-s="youtube.videos" data-exact>5</em><small>동영상</small></span></span>
       </a>
       <a class="ch glass reveal" style="--d:.1s" href="https://www.instagram.com/hayul2050/" target="_blank" rel="noopener" aria-label="인스타그램 hayul2050으로 이동">
         <span class="ch-top"><span class="ch-ic"><svg class="ic"><use href="#i-camera"/></svg></span><span class="ch-name"><b>Instagram</b><small>@hayul2050</small></span><svg class="ic"><use href="#i-arrow"/></svg></span>
-        <span class="stats"><span><em>340</em><small>팔로워</small></span><span><em>25</em><small>게시물</small></span></span>
+        <span class="stats"><span><em data-s="instagram.followers">340</em><small>팔로워</small></span><span><em data-s="instagram.posts" data-exact>25</em><small>게시물</small></span></span>
       </a>
       <a class="ch glass reveal" style="--d:.2s" href="https://www.tiktok.com/@hayul_2134" target="_blank" rel="noopener" aria-label="틱톡 hayul_2134로 이동">
         <span class="ch-top"><span class="ch-ic"><svg class="ic"><use href="#i-note"/></svg></span><span class="ch-name"><b>TikTok</b><small>@hayul_2134</small></span><svg class="ic"><use href="#i-arrow"/></svg></span>
-        <span class="stats"><span><em>1,169</em><small>팔로워</small></span><span><em>2.5만</em><small>좋아요</small></span></span>
+        <span class="stats"><span><em data-s="tiktok.followers">1.2천</em><small>팔로워</small></span><span><em data-s="tiktok.likes">2.6만</em><small>좋아요</small></span></span>
       </a>
     </div>
-    <p class="mono asof reveal">2026.09.30 기준</p>
+    <p class="mono asof reveal" id="statsAsof">2026.09.30 00:00 기준</p>
   </section>
 
   <section class="sec aura left" id="contact">
@@ -391,6 +391,24 @@
     root.setAttribute('data-theme', e.matches ? 'dark' : 'light'); label();
   };
   if (mq.addEventListener) mq.addEventListener('change', onSys);
+
+  // 채널 수치: stats.json(매일 00:00 KST 갱신)을 읽어 반올림 표시
+  (function () {
+    function round(n) {
+      if (n < 100) return String(n);
+      var r = Math.round(n / 10) * 10; if (r < 1000) return String(r);   // 232 → 230
+      r = Math.round(n / 100) / 10; if (r < 10) return r + '천';           // 1,169 → 1.2천
+      r = Math.round(n / 1e3) / 10; if (r < 1e4) return r + '만';          // 81,192 → 8.1만
+      return Math.round(n / 1e7) / 10 + '억';
+    }
+    fetch('/stats.json', { cache: 'no-cache' }).then(function (r) { return r.json(); }).then(function (j) {
+      document.querySelectorAll('[data-s]').forEach(function (el) {
+        var p = el.dataset.s.split('.'), v = j[p[0]] && j[p[0]][p[1]];
+        if (typeof v === 'number') el.textContent = el.hasAttribute('data-exact') ? v.toLocaleString('ko-KR') : round(v);
+      });
+      if (j.updated) document.getElementById('statsAsof').textContent = j.updated.replace(/-/g, '.') + ' 00:00 기준';
+    }).catch(function () {});
+  })();
 
   // 글래스 달력: 구글 캘린더 일정(/api/busy)을 읽어 '일정 있음' 날짜를 표시, 고른 날짜로 Gmail 문의
   (function () {
