@@ -3,7 +3,20 @@ const USER = 'hayul2050';
 const UA_WEB = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0 Safari/537.36';
 const UA_APP = 'Instagram 269.0.0.18.75 Android (30/11; 420dpi; 1080x2220; samsung; SM-G973F; beyond1; exynos9820; ko_KR; 443569434)';
 
-export async function onRequestGet() {
+export async function onRequestGet(ctx) {
+  const cache = caches.default, key = new Request(new URL('/api/ig', ctx.request.url));
+  const hit = await cache.match(key);
+  if (hit) return hit;
+  const res = await fetchIg();
+  if (res.status === 200) {
+    const r = new Response(res.body, res); r.headers.set('cache-control', 'public, max-age=21600');
+    ctx.waitUntil(cache.put(key, r.clone()));
+    return r;
+  }
+  return res;
+}
+
+async function fetchIg() {
   const tries = [
     ['https://www.instagram.com/api/v1/users/web_profile_info/?username=' + USER, { 'user-agent': UA_WEB, 'x-ig-app-id': '936619743392459' }],
     ['https://i.instagram.com/api/v1/users/web_profile_info/?username=' + USER, { 'user-agent': UA_APP, 'x-ig-app-id': '567067343352427' }],

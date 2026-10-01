@@ -2,12 +2,17 @@
 const ICS = 'https://calendar.google.com/calendar/ical/officialhayul%40gmail.com/public/basic.ics';
 const KST = 9 * 3600e3;
 
-export async function onRequestGet() {
+export async function onRequestGet(ctx) {
+  const cache = caches.default, key = new Request(new URL('/api/busy', ctx.request.url));
+  const hit = await cache.match(key);
+  if (hit) return hit;
   try {
     const r = await fetch(ICS, { cf: { cacheTtl: 300, cacheEverything: true } });
     if (!r.ok) throw new Error('ics ' + r.status);
     const busy = parse(await r.text());
-    return json({ busy, updated: new Date().toISOString() }, 200, 300);
+    const res = json({ busy, updated: new Date().toISOString() }, 200, 300);
+    ctx.waitUntil(cache.put(key, res.clone()));
+    return res;
   } catch (e) {
     return json({ busy: [], error: String(e.message || e) }, 502, 30);
   }
