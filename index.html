@@ -84,6 +84,12 @@
   :root[data-theme="dark"] .theme-btn .moon { opacity:1; transform:none; }
   :root[data-theme="dark"] .theme-btn .sun { opacity:0; transform:rotate(80deg) scale(.4); }
   html.tt, html.tt *, html.tt *::before, html.tt *::after { transition:background-color .45s ease, color .45s ease, border-color .45s ease, fill .45s ease, stroke .45s ease, box-shadow .45s ease !important; }
+  /* 테마 전환 중에도 등장 애니메이션이 끊기지 않게 */
+  html.tt.js .reveal { transition-property:opacity, transform, scale, background-color, color, border-color, box-shadow !important; transition-duration:.8s, .8s, .4s, .45s, .45s, .45s, .45s !important;
+                       transition-timing-function:cubic-bezier(.2,.7,.2,1), cubic-bezier(.2,.7,.2,1), cubic-bezier(.2,.7,.2,1), ease, ease, ease, ease !important; transition-delay:0s !important; }
+  html.tt.js .reveal.in { transition-delay:var(--d,0s), var(--d,0s), 0s, 0s, 0s, 0s, 0s !important; }
+  html.tt.js .ln > span, html.tt.js .rule { transition:transform .9s cubic-bezier(.2,.7,.2,1) !important; }
+  html.tt.js .ln.in > span { transition-delay:var(--d,0s) !important; }
   html.tt .theme-btn svg { transition:transform .55s cubic-bezier(.2,.7,.2,1), opacity .35s ease, stroke .45s ease !important; }
 
   /* 히어로 */
@@ -101,7 +107,7 @@
   .track i { display:block; border-radius:3px; background:var(--clip); }
   .track i.s { background:var(--clip2); } .track i.a { background:var(--accent); }
   .cue { display:flex; justify-content:space-between; margin-top:14px; }
-  .playhead { position:absolute; top:0; bottom:28px; width:2px; background:var(--accent); left:0; }
+  .playhead { position:absolute; top:0; bottom:28px; width:2px; background:var(--accent); left:0; will-change:transform; }
   .playhead b { position:absolute; top:-2px; left:8px; transform:translateY(-100%); padding:1px 7px; border-radius:4px; background:var(--accent); color:var(--bg);
                 font-family:var(--mono); font-size:.72rem; font-weight:600; letter-spacing:.04em; white-space:nowrap; }
   .playhead.flip b { left:auto; right:8px; }
@@ -415,7 +421,7 @@
   @keyframes c1push { from { transform:translateX(var(--dx,6%)) scale(var(--s0,1.06)); } }
   .c1-hold .c1-w { animation:c1hold 1.2s cubic-bezier(.2,.7,.2,1) both; }
   @keyframes c1hold { from { transform:scale(.94); letter-spacing:.02em; opacity:.0; } 18% { opacity:1; } to { transform:scale(1.03); } }
-  .c1-out { -webkit-text-stroke:2px currentColor; color:transparent !important; }
+  .c1-out { -webkit-text-stroke:2px #fff; color:transparent !important; } /* currentColor는 transparent가 되어 외곽선이 안 보이던 문제 수정 */
   .c1-bars { position:absolute; inset:18% 0; display:flex; flex-direction:column; gap:3%; }
   .c1-bars div { flex:1; display:flex; gap:1%; } .c1-bars i { display:block; border-radius:4px; }
   .c1-hud { position:absolute; inset:0; pointer-events:none; mix-blend-mode:difference; color:#fff; font-family:var(--mono); font-size:11px; letter-spacing:.18em; z-index:2; }
@@ -464,6 +470,11 @@
   .bgfx .o { border-radius:50%; } .bgfx .p { border-radius:999px; } .bgfx .r { border-radius:34%; }
   :root { --bblur:5px; --bo:.45; --bgb:rgba(255,255,255,.55); --bgh:rgba(255,255,255,.85); --b1:#6d5dfc; --b2:#4f7dff; --b3:#1bb3d1; }
   :root[data-theme="dark"] { --bo:.35; --bgb:rgba(255,255,255,.14); --bgh:rgba(255,255,255,.28); --b1:#a594ff; --b2:#7f9cff; --b3:#5fd8ec; }
+  .bgfx i.bk { background:none; border:0; box-shadow:none; filter:none; opacity:1; }
+  .bgfx i.bk::before, .bgfx i.bk::after { content:""; position:absolute; inset:calc(var(--m) * -1); left:calc(var(--m) * -1); top:calc(var(--m) * -1); width:auto; height:auto; border-radius:0; filter:none;
+    background:var(--ia, none) center/100% 100% no-repeat; opacity:var(--oa, 0); transition:opacity .45s ease; }
+  .bgfx i.bk::after { background-image:var(--ib, none); opacity:var(--ob, 0); }
+  html.tt .bgfx i.bk::before, html.tt .bgfx i.bk::after { transition:opacity .45s ease !important; }
 </style>
 </head>
 <body>
@@ -821,8 +832,16 @@
       });
       h += '<div class="c1-hud"><em></em><em></em><em></em><em></em><span class="tl">REC</span><span class="tr">00:00:00:00</span><span class="bl">CUT 01/' + p2(S.length) + '</span><span class="br">편집도 기획입니다</span></div>';
       iy.innerHTML = h;
-      var shots = iy.querySelectorAll('.c1-shot'), hudT = iy.querySelector('.c1-hud .tr'), hudC = iy.querySelector('.c1-hud .bl'), big = iy.querySelector('.c1-tc'), t0 = performance.now();
-      loop(function (n) { var f = (n - t0) / 1000 * 30 * 7; hudT.textContent = tcode(f); if (big) big.textContent = tcode(f); });
+      var shots = iy.querySelectorAll('.c1-shot'), hudT = iy.querySelector('.c1-hud .tr'), hudC = iy.querySelector('.c1-hud .bl'), big = iy.querySelector('.c1-tc'), t0, lastTc = '';
+      // 웹폰트가 늦게 오는 PC(윈도우·저사양)에서도 대체 글꼴로 먼저 재생되지 않도록, 컷에 쓰는 글자를 받아 둔 뒤 시작 (최대 1.6초 대기)
+      var fontsReady = document.fonts && document.fonts.load ? Promise.race([
+        Promise.all(['800', '600'].map(function (w) { return document.fonts.load(w + ' 100px "Pretendard Variable"', '무엇을보여줄지언제어떻게기억하게할지편집도기획입니다.'); })),
+        new Promise(function (r) { setTimeout(r, 1600); })
+      ]).catch(function () {}) : Promise.resolve();
+      fontsReady.then(function () { if (!over) startCut(); });
+      function startCut() {
+      t0 = performance.now();
+      loop(function (n) { var tc = tcode((n - t0) / 1000 * 30 * 7); if (tc === lastTc) return; lastTc = tc; hudT.textContent = tc; if (big) big.textContent = tc; });
       var at = 0;
       S.forEach(function (s, i) {
         T(function () {
@@ -833,6 +852,7 @@
         }, at);
         at += s.d;
       });
+      }
       // 마지막 컷: 검은 화면 가운데의 '편집도 / 기획입니다.'가 실제 사이트 제목 자리로 이동하며 배경이 사이트로 바뀜 (매치 컷)
       function match(shot) {
         var mt = shot.querySelector('.c1-mt'), h1 = document.querySelector('.hero h1'); if (!h1) return;
@@ -1088,7 +1108,7 @@
   // 상단 진행 바와 재생 헤드(타임코드)는 페이지 스크롤 진행도에 맞춰 움직임
   var ph = document.querySelector('.playhead'), tcEl = ph.querySelector('b'), bar = document.querySelector('.progress');
   var still = false, phX = null;
-  var rm = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var rm = false; // 윈도우의 '애니메이션 효과 끄기'(동작 줄이기) 설정과 무관하게 맥과 같은 패럴랙스
   var bgs = [].slice.call(document.querySelectorAll('.bgfx i'));
   // 각 도형의 시작 위치: 페이지 전체를 스크롤하는 동안 화면을 고르게 지나가도록 배치
   function placeBg() {
@@ -1096,21 +1116,60 @@
     bgs.forEach(function (el) { el.f = +el.dataset.f; el.style.top = (+el.dataset.t * (vh + (rm ? 0 : max * el.f)) - el.offsetHeight / 2).toFixed(0) + 'px'; });
   }
   placeBg();
+  // 배경 도형을 한 번만 그려 둔 이미지로 바꿈: 스크롤 중에 매 프레임 블러를 다시 계산하지 않아 저사양에서도 부드러움 (모양은 CSS와 동일)
+  (function () {
+    // 크롬·엣지·웨일 등 크로미움 계열(윈도우 대부분)에만 적용, 그 외 브라우저는 기존 CSS 그대로
+    var ua = navigator.userAgent; if (!/Chrome\/|Chromium|Edg\//.test(ua) || /CriOS|FxiOS|Firefox/.test(ua)) return;
+    var M = 96, slot = 0, enc = function (s) { return 'url("data:image/svg+xml;charset=utf-8,' + encodeURIComponent(s) + '")'; };
+    function bake() {
+      var rs = getComputedStyle(document.documentElement), g = function (n) { return rs.getPropertyValue(n).trim(); };
+      var bo = g('--bo'), bl = g('--bblur'), bb = g('--bgb'), bh = g('--bgh'), key = slot ? 'b' : 'a';
+      bgs.forEach(function (el) {
+        var c = getComputedStyle(el).getPropertyValue('--c').trim(), w = el.offsetWidth, h = el.offsetHeight;
+        var r = el.classList.contains('o') ? '50%' : el.classList.contains('p') ? '999px' : '34%';
+        var mix = function (p) { return 'color-mix(in srgb, ' + c + ' ' + p + '%, transparent)'; };
+        var st = 'position:absolute;left:' + M + 'px;top:' + M + 'px;width:' + w + 'px;height:' + h + 'px;box-sizing:border-box;border-radius:' + r + ';opacity:' + bo + ';filter:blur(' + bl + ');' +
+          'background:linear-gradient(140deg, ' + mix(34) + ', ' + mix(6) + ' 70%);border:1px solid ' + bb + ';' +
+          'box-shadow:inset 0 1px 1px ' + bh + ', inset 0 -14px 30px ' + mix(14) + ', 0 24px 60px -20px ' + mix(40);
+        var hi = 'position:absolute;left:16%;top:9%;width:42%;height:24%;border-radius:50%;background:linear-gradient(180deg, ' + bh + ', transparent);filter:blur(2px);opacity:.8';
+        var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="' + (w + 2 * M) + '" height="' + (h + 2 * M) + '"><foreignObject width="100%" height="100%"><div xmlns="http://www.w3.org/1999/xhtml" style="' + st + '"><div style="' + hi + '"></div></div></foreignObject></svg>';
+        el.style.setProperty('--m', M + 'px');
+        el.style.setProperty('--i' + key, enc(svg));
+        el.style.setProperty('--o' + key, 1); el.style.setProperty('--o' + (slot ? 'a' : 'b'), 0);
+        el.classList.add('bk');
+      });
+      slot = 1 - slot;
+    }
+    bake();
+    new MutationObserver(bake).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+  })();
   function pad(n) { return (n < 10 ? '0' : '') + n; }
+  // 페이지 높이·타임라인 폭은 크기가 바뀔 때만 다시 잼 (스크롤 중엔 읽지 않음 → 강제 레이아웃 없음)
+  var maxY = 0, tlW = 1, phFlip = null, phTxt = '', scrollRaf = 0;
+  function measure() { maxY = document.documentElement.scrollHeight - window.innerHeight; tlW = ph.parentNode.clientWidth || 1; }
+  function setPh(x) { // x: 0~1, 기존 left:% 와 같은 위치를 transform 으로
+    ph.style.transform = 'translate3d(' + (x * tlW).toFixed(1) + 'px,0,0)';
+  }
+  function setFlip(f) { if (f !== phFlip) { phFlip = f; ph.classList.toggle('flip', f); } }
+  function setTc(t) { if (t !== phTxt) { phTxt = t; tcEl.textContent = t; } }
   function move() {
-    var max = document.documentElement.scrollHeight - window.innerHeight;
-    var p = max > 0 ? Math.max(0, Math.min(1, window.scrollY / max)) : 0;
+    scrollRaf = 0;
+    var y = window.scrollY, p = maxY > 0 ? Math.max(0, Math.min(1, y / maxY)) : 0;
     bar.style.setProperty('--p', p);
-    for (var k = 0; k < bgs.length; k++) bgs[k].style.transform = 'translate3d(0,' + (-(rm ? 0 : window.scrollY) * bgs[k].f).toFixed(1) + 'px,0)';
+    for (var k = 0; k < bgs.length; k++) bgs[k].style.transform = 'translate3d(0,' + (-(rm ? 0 : y) * bgs[k].f).toFixed(1) + 'px,0)';
     if (phX !== null) return; // 인트로 재생 중에는 인트로가 재생 헤드를 움직임
     var q = still ? 0.38 : p, s = Math.round(q * 60);
-    ph.style.left = (0.3 + q * 99.4) + '%';
-    ph.classList.toggle('flip', q > 0.82);
-    tcEl.textContent = pad(Math.floor(s / 60)) + ':' + pad(s % 60);
+    setPh(0.003 + q * 0.994);
+    setFlip(q > 0.82);
+    setTc(pad(Math.floor(s / 60)) + ':' + pad(s % 60));
   }
-  window.addEventListener('scroll', function () { window.requestAnimationFrame(move); }, { passive:true });
-  window.addEventListener('resize', function () { placeBg(); move(); });
-  window.addEventListener('load', function () { placeBg(); move(); });
+  function relayout() { measure(); placeBg(); move(); }
+  measure();
+  window.addEventListener('scroll', function () { if (!scrollRaf) scrollRaf = window.requestAnimationFrame(move); }, { passive:true });
+  window.addEventListener('resize', relayout);
+  window.addEventListener('load', relayout);
+  // 글꼴·달력·영상 카드 때문에 페이지 길이가 늦게 바뀌어도 진행 바·배경 위치가 어긋나지 않게
+  if ('ResizeObserver' in window) { var roT = 0; new ResizeObserver(function () { if (!roT) roT = requestAnimationFrame(function () { roT = 0; relayout(); }); }).observe(document.body); }
   move();
 
   // 첫 진입 인트로: 재생 헤드가 끝까지 훑으며 클립이 차례로 '찍히고', 오른쪽으로 빠져나가 사라진 뒤 현재 위치에서 페이드인 (1회)
@@ -1142,14 +1201,14 @@
         else { finish(); return; }
         phX = q;
         var x = 0.003 + q * 0.994;
-        ph.style.left = x * 100 + '%'; ph.classList.toggle('flip', q > 0.82);
+        setPh(x); setFlip(q > 0.82);
         tl.style.setProperty('--x', x * 100 + '%');
         if (t < T1) {
           cx.forEach(function (v, i) { if (x >= v) clips[i].classList.add('hit'); });
           tx.forEach(function (v, i) { if (x >= v) tcs[i].classList.add('hit'); });
         }
         var sec = Math.min(q, 1) * 60, s = Math.floor(sec);
-        tcEl.textContent = pad(Math.floor(s / 60)) + ':' + pad(s % 60) + ':' + pad(Math.floor((sec - s) * 30));
+        setTc(pad(Math.floor(s / 60)) + ':' + pad(s % 60) + ':' + pad(Math.floor((sec - s) * 30)));
         requestAnimationFrame(frame);
       });
     }
@@ -1171,9 +1230,10 @@
 });
 });
 
-/* 윈도우 마우스 휠도 맥 트랙패드처럼 부드럽게 스크롤 (트랙패드·터치는 그대로 둠) */
+/* 윈도우 마우스 휠도 맥 트랙패드처럼 부드럽게 스크롤 (트랙패드·터치는 그대로 둠)
+   시간 기준으로 감속 → 144Hz 모니터든 저사양(프레임 저하)이든 같은 속도·같은 느낌 */
 (function () {
-  var target = null, raf = 0, root = document.scrollingElement || document.documentElement;
+  var target = null, pos = 0, last = 0, raf = 0, root = document.scrollingElement || document.documentElement;
   function inner(el, dy) {
     for (; el && el !== document.body && el !== root; el = el.parentElement) {
       var o = getComputedStyle(el).overflowY;
@@ -1183,21 +1243,27 @@
     return false;
   }
   function stop() { if (raf) cancelAnimationFrame(raf); raf = 0; target = null; }
+  function step(now) {
+    var max = Math.max(0, root.scrollHeight - innerHeight), dt = Math.min(50, Math.max(1, now - last)); last = now;
+    if (target > max) target = max;
+    // 사용자가 스크롤바를 끌었거나 다른 이유로 위치가 바뀌었으면 그 위치부터 이어감
+    if (Math.abs(root.scrollTop - pos) > 4) pos = root.scrollTop;
+    pos += (target - pos) * (1 - Math.pow(0.86, dt / 16.667)); // 60fps에서 프레임당 14% 접근과 동일
+    if (Math.abs(target - pos) < 0.5) pos = target;
+    window.scrollTo({ top: pos, behavior: 'instant' });
+    if (pos === target) { raf = 0; target = null; return; }
+    raf = requestAnimationFrame(step);
+  }
   window.addEventListener('wheel', function (e) {
     if (e.ctrlKey || e.defaultPrevented || Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
     var dy = e.deltaY * (e.deltaMode === 1 ? 40 : e.deltaMode === 2 ? innerHeight : 1);
     if (target === null && e.deltaMode === 0 && Math.abs(dy) < 50) return; // 트랙패드(작고 연속적인 값)
-    if (inner(e.target, dy) || root.scrollHeight <= innerHeight + 1 || getComputedStyle(document.body).overflowY === 'hidden') return;
+    if (document.documentElement.classList.contains('intro-on') || inner(e.target, dy) || root.scrollHeight <= innerHeight + 1) return;
     e.preventDefault();
-    var max = root.scrollHeight - innerHeight;
-    target = Math.max(0, Math.min(max, (target === null ? root.scrollTop : target) + dy));
-    if (!raf) raf = requestAnimationFrame(function step() {
-      var cur = root.scrollTop, d = target - cur;
-      if (Math.abs(d) < 0.6) { window.scrollTo({ top: target, behavior: 'instant' }); raf = 0; target = null; return; }
-      var s = d * 0.14; if (Math.abs(s) < 1) s = d;
-      window.scrollTo({ top: cur + s, behavior: 'instant' });
-      raf = requestAnimationFrame(step);
-    });
+    var max = Math.max(0, root.scrollHeight - innerHeight);
+    if (target === null) pos = root.scrollTop;
+    target = Math.max(0, Math.min(max, (target === null ? pos : target) + dy));
+    if (!raf) { last = performance.now(); raf = requestAnimationFrame(step); }
   }, { passive: false });
   ['keydown', 'mousedown', 'touchstart'].forEach(function (t) { window.addEventListener(t, stop, { passive: true }); });
 })();
