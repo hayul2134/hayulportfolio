@@ -455,14 +455,14 @@
 
   /* 배경 패럴랙스: 리퀴드 글래스 느낌의 둥근 도형들이 스크롤의 8~16% 속도로 아주 천천히 이동, 콘텐츠는 그대로 */
   .bgfx { position:fixed; inset:0; z-index:-1; pointer-events:none; overflow:hidden; }
-  .bgfx i { position:absolute; display:block; will-change:transform; opacity:var(--bo);
+  .bgfx i { position:absolute; display:block; will-change:transform; opacity:var(--bo); filter:blur(var(--bblur));
             background:linear-gradient(140deg, color-mix(in srgb, var(--c) 34%, transparent), color-mix(in srgb, var(--c) 6%, transparent) 70%);
             border:1px solid var(--bgb);
             box-shadow:inset 0 1px 1px var(--bgh), inset 0 -14px 30px color-mix(in srgb, var(--c) 14%, transparent), 0 24px 60px -20px color-mix(in srgb, var(--c) 40%, transparent); }
   .bgfx i::before { content:""; position:absolute; left:16%; top:9%; width:42%; height:24%; border-radius:50%;
                     background:linear-gradient(180deg, var(--bgh), transparent); filter:blur(2px); opacity:.8; }
   .bgfx .o { border-radius:50%; } .bgfx .p { border-radius:999px; } .bgfx .r { border-radius:34%; }
-  :root { --bo:.45; --bgb:rgba(255,255,255,.55); --bgh:rgba(255,255,255,.85); --b1:#6d5dfc; --b2:#4f7dff; --b3:#1bb3d1; }
+  :root { --bblur:5px; --bo:.45; --bgb:rgba(255,255,255,.55); --bgh:rgba(255,255,255,.85); --b1:#6d5dfc; --b2:#4f7dff; --b3:#1bb3d1; }
   :root[data-theme="dark"] { --bo:.35; --bgb:rgba(255,255,255,.14); --bgh:rgba(255,255,255,.28); --b1:#a594ff; --b2:#7f9cff; --b3:#5fd8ec; }
 </style>
 </head>
