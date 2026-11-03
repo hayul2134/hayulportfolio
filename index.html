@@ -170,6 +170,41 @@
   .steps h3 { font-size:1.2rem; letter-spacing:-0.025em; margin:0 0 4px; }
   .steps p { margin:0; color:var(--sub); word-break:keep-all; }
 
+  /* 01 작업 기록: 케이스 하나 = 왼쪽 정보(누구와·맡은 일·어떻게·결과) + 오른쪽 영상 */
+  .cases { display:grid; gap:clamp(72px,10vw,128px); }
+  .case { display:grid; grid-template-columns:minmax(0,1fr); gap:28px; }
+  .case > * { min-width:0; }
+  @media (min-width:900px) { .case { grid-template-columns:minmax(0,5fr) minmax(0,7fr); column-gap:56px; } .case-info { position:sticky; top:96px; align-self:start; } }
+  .case-hd { display:flex; justify-content:space-between; gap:12px; align-items:baseline; }
+  .case-no { font-family:var(--mono); font-size:.8rem; letter-spacing:.08em; color:var(--accent); font-weight:600; }
+  .case-t { font-size:clamp(1.6rem,3.4vw,2.3rem); line-height:1.2; letter-spacing:-0.045em; font-weight:800; margin:8px 0 18px; word-break:keep-all; }
+  .case-dl { margin:0; }
+  .case-dl > div { display:grid; grid-template-columns:72px 1fr; gap:12px; padding:13px 0; border-top:1px solid var(--line); }
+  .case-dl dt { font-family:var(--mono); font-size:.76rem; letter-spacing:.04em; color:var(--sub); padding-top:3px; }
+  .case-dl dd { margin:0; word-break:keep-all; }
+  .case-dl dd b { font-weight:700; }
+  .kpis { list-style:none; margin:0; padding:0; display:flex; flex-wrap:wrap; gap:8px; }
+  .kpi { padding:10px 14px; border-radius:16px; display:flex; flex-direction:column; line-height:1.25; }
+  .kpi em { font-style:normal; font-weight:800; font-size:1.25rem; letter-spacing:-0.04em; }
+  .kpi span { font-size:.76rem; color:var(--sub); }
+  .case-media .asof { margin:12px 0 0; }
+  .case .frames { grid-template-columns:1fr; }
+  @media (min-width:600px) { .case .frames.lead { grid-template-columns:repeat(2,1fr); } .case .frames.lead > :first-child { grid-column:1 / -1; } }
+  .reels.ten { grid-template-columns:none; grid-auto-flow:column; grid-auto-columns:36%; overflow-x:auto; scroll-snap-type:x mandatory; padding-bottom:6px; }
+  .reels.ten li { scroll-snap-align:start; }
+  @media (min-width:600px) { .reels.ten { grid-auto-flow:row; grid-auto-columns:auto; grid-template-columns:repeat(5,minmax(0,1fr)); overflow:visible; } }
+  .board { list-style:none; margin:0; padding:clamp(24px,4vw,40px); display:grid; gap:0; }
+  .board li { display:flex; flex-direction:column; gap:2px; padding:18px 0; border-top:1px solid var(--line); }
+  .board li:first-child { border-top:0; padding-top:0; } .board li:last-child { padding-bottom:0; }
+  .board em { font-style:normal; font-weight:800; font-size:clamp(2rem,5vw,3.2rem); letter-spacing:-0.05em; line-height:1.05; }
+  .board em small { font-size:.5em; color:var(--sub); font-weight:600; }
+  .board span { color:var(--sub); font-size:.9rem; word-break:keep-all; }
+  /* 작업 방식 → 의뢰 유도 */
+  .cta { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:16px 24px; padding:24px clamp(20px,3vw,32px); }
+  .cta p { margin:0; display:flex; flex-direction:column; gap:2px; word-break:keep-all; }
+  .cta b { font-size:clamp(1.15rem,2.4vw,1.45rem); letter-spacing:-0.03em; }
+  .cta span { color:var(--sub); }
+
   /* 02 소개 */
   .split { display:grid; gap:0; }
   @media (min-width:900px) { .split { grid-template-columns:200px 1fr; column-gap:48px; } .split > .label { position:sticky; top:96px; align-self:start; } .split .rule { display:none; } }
@@ -507,7 +542,7 @@
     </svg>
     <b>하율</b><span>포트폴리오</span>
   </a>
-  <nav class="nav" aria-label="섹션 이동"><a href="#work">작업</a><a href="#about">소개</a><a href="#channel">채널</a><a href="#contact">문의</a></nav>
+  <nav class="nav" aria-label="섹션 이동"><a href="#work">작업</a><a href="#about">소개</a><a href="#channel">채널</a><a href="#process">방식</a><a href="#contact">문의</a></nav>
   <div class="hd-r">
   <button class="theme-btn replay-btn" type="button" id="replayBtn" aria-label="인트로 다시 보기" title="인트로 다시 보기">
     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 1 0 2.6-6.4"/><path d="M3 3v5h5"/><path d="M10 8.8v6.4l5-3.2z"/></svg>
@@ -541,41 +576,20 @@
   </div>
 
   <section class="sec" id="work">
-    <h2 class="label reveal"><span class="no">01</span>대표 작업</h2>
+    <h2 class="label reveal"><span class="no">01</span>작업 기록</h2>
     <div class="rule"></div>
-    <p class="note reveal">편집은 이렇게 진행합니다.</p>
-    <ol class="steps">
-      <li class="glass reveal" style="--d:0s"><span class="q">01</span><h3>의도 파악</h3><p>영상의 의도와 목적을 먼저 파악합니다.</p></li>
-      <li class="glass reveal" style="--d:.12s"><span class="q">02</span><h3>취사선택</h3><p>무엇을 남기고 무엇을 덜어낼지 정합니다.</p></li>
-      <li class="glass reveal" style="--d:.24s"><span class="q">03</span><h3>구성</h3><p>순서와 호흡, 리듬, 전환을 설계합니다.</p></li>
-      <li class="glass reveal" style="--d:.36s"><span class="q">04</span><h3>완성</h3><p>최종적인 영상 언어로 다듬어 마무리합니다.</p></li>
-    </ol>
-    <!-- 작업 추가: article.work 하나 = 작업 하나 (data-yt에 유튜브 영상 ID, 숏폼은 class에 is-short) -->
-    <div class="frames reveal-group">
-      <article class="work reveal" style="--d:0.0s">
-        <button class="shot vid is-short" type="button" data-yt="fxJfwMIWKqU" aria-label="일본에서 가장 특이한 유튜버 TMI 재생">
-          <img src="https://i.ytimg.com/vi/fxJfwMIWKqU/hqdefault.jpg" alt="" loading="lazy" decoding="async"><span class="tcode">00:00:36</span><span class="play"><svg class="ic"><use href="#i-play"/></svg></span>
-        </button>
-        <div class="cap"><span class="n">01</span><span><b>일본에서 가장 특이한 유튜버 TMI</b><small>머어엉 · 숏폼 · 2025</small><small>MCN 애니멀라운지 전담 편집 · 조회수 133만</small></span></div>
-      </article>
-      <article class="work reveal" style="--d:0.15s">
-        <button class="shot vid" type="button" data-yt="tVBkHFC2QrU" aria-label="도파민 터지는 10대들의 20대 로망 재생">
-          <img src="https://i.ytimg.com/vi/tVBkHFC2QrU/hq720.jpg" alt="" loading="lazy" decoding="async"><span class="tcode">00:09:06</span><span class="play"><svg class="ic"><use href="#i-play"/></svg></span>
-        </button>
-        <div class="cap"><span class="n">02</span><span><b>도파민 터지는 10대들의 20대 로망</b><small>십세들 × THE SMC · 롱폼 예능 · 2025</small><small>협업 촬영 참여 · 편집</small></span></div>
-      </article>
-      <article class="work reveal" style="--d:0.3s">
-        <button class="shot vid" type="button" data-yt="Ml9TuL5-6ak" aria-label="2026 서울영상축제 Sketch Film 재생">
-          <img src="https://i.ytimg.com/vi/Ml9TuL5-6ak/hq720.jpg" alt="" loading="lazy" decoding="async"><span class="tcode">00:03:19</span><span class="play"><svg class="ic"><use href="#i-play"/></svg></span>
-        </button>
-        <div class="cap"><span class="n">03</span><span><b>2026 서울영상축제 Sketch Film</b><small>서울영상고 공식 채널 · 2026</small><small>편집부장 재직 중 편집</small></span></div>
-      </article>
-    </div>
-
-    <div class="more">
-      <div class="more-head reveal"><h3>숏폼 · 머어엉</h3><p class="mono">43편 · 누적 1,868만 조회수 · 100만+ 5편</p></div>
-      <p class="note reveal">MCN 애니멀라운지에서 전담 편집한 숏폼 중 일부입니다. <span class="mono">2026.11 기준</span></p>
-      <ul class="reels reveal">
+    <p class="note reveal">누구와, 무엇을, 어떻게 맡아, 어떤 결과를 냈는지 정리했습니다.</p>
+    <!-- 작업 추가: article.case 하나 = 작업 하나 (왼쪽 정보 · 오른쪽 영상). 영상은 data-yt에 유튜브 ID -->
+    <div class="cases">
+    <article class="case">
+      <div class="case-info">
+        <div class="case-hd reveal"><span class="case-no">CASE 01</span><span class="mono">2024 – 2025 · 약 1년</span></div>
+        <h3 class="case-t reveal">MCN 애니멀라운지 전담 편집</h3>
+        <dl class="case-dl reveal"><div><dt>누구와</dt><dd>MCN 애니멀라운지 소속 유튜버 <b>머어엉</b>, <b>미담이냥</b></dd></div><div><dt>맡은 일</dt><dd>머어엉 숏폼 TMI 시리즈 편집(약 7개월), 이어서 미담이냥 채널 편집(약 5개월)</dd></div><div><dt>어떻게</dt><dd>아트머그 정기 외주로 시작해 정식 편집자로 합류했습니다. 미담이냥 편집 중 약 3개월은 사무실에 출근해 팀과 함께 작업했습니다.</dd></div><div><dt>결과</dt><dd><ul class="kpis"><li class="kpi glass"><em>43편</em><span>머어엉 숏폼 편집</span></li><li class="kpi glass"><em>1,868만</em><span>누적 조회수</span></li><li class="kpi glass"><em>5편</em><span>100만+ 영상</span></li></ul></dd></div></dl>
+      </div>
+      <div class="case-media">
+        <ul class="reels ten reveal">
+        <li><button class="reel vid" type="button" data-yt="fxJfwMIWKqU" aria-label="일본에서 가장 특이한 유튜버 TMI 재생"><img src="https://i.ytimg.com/vi/fxJfwMIWKqU/hqdefault.jpg" alt="" loading="lazy" decoding="async"><span class="views">133만</span></button><span class="rt">일본에서 가장 특이한 유튜버 TMI</span></li>
         <li><button class="reel vid" type="button" data-yt="bzzuRmBTCf8" aria-label="파피 플레이 타임 4 '도이 더 도우맨' TMI 재생"><img src="https://i.ytimg.com/vi/bzzuRmBTCf8/hqdefault.jpg" alt="" loading="lazy" decoding="async"><span class="views">125만</span></button><span class="rt">파피 플레이 타임 4 '도이 더 도우맨' TMI</span></li>
         <li><button class="reel vid" type="button" data-yt="9-RaoPI_GPI" aria-label="'Rat dance' 숨겨진 사실 TMI 재생"><img src="https://i.ytimg.com/vi/9-RaoPI_GPI/hqdefault.jpg" alt="" loading="lazy" decoding="async"><span class="views">125만</span></button><span class="rt">'Rat dance' 숨겨진 사실 TMI</span></li>
         <li><button class="reel vid" type="button" data-yt="lc0EYbTlV2w" aria-label="'도파민' 숨겨진 사실 TMI 재생"><img src="https://i.ytimg.com/vi/lc0EYbTlV2w/hqdefault.jpg" alt="" loading="lazy" decoding="async"><span class="views">113만</span></button><span class="rt">'도파민' 숨겨진 사실 TMI</span></li>
@@ -586,20 +600,64 @@
         <li><button class="reel vid" type="button" data-yt="L2Yq8SO5Uw8" aria-label="오징어 게임 3 '게임 떡밥' TMI 재생"><img src="https://i.ytimg.com/vi/L2Yq8SO5Uw8/hqdefault.jpg" alt="" loading="lazy" decoding="async"><span class="views">79만</span></button><span class="rt">오징어 게임 3 '게임 떡밥' TMI</span></li>
         <li><button class="reel vid" type="button" data-yt="NF4PxDcnruY" aria-label="'어른들은 몰라요' 숨겨진 사실 TMI 재생"><img src="https://i.ytimg.com/vi/NF4PxDcnruY/hqdefault.jpg" alt="" loading="lazy" decoding="async"><span class="views">76만</span></button><span class="rt">'어른들은 몰라요' 숨겨진 사실 TMI</span></li>
       </ul>
-    </div>
-
-    <div class="more">
-      <div class="more-head reveal"><h3>학교 공식 채널</h3><p class="mono">편집부장 재직 중 편집 · 업로드</p></div>
-      <div class="frames two">
-      <article class="work reveal" style="--d:0.0s">
-        <button class="shot vid" type="button" data-yt="nx2MNQi0nHU" aria-label="동아리 마스터의 호기로운 크루생활 레시피 ep.1 | 애니미디어 재생"><img src="https://i.ytimg.com/vi/nx2MNQi0nHU/hq720.jpg" alt="" loading="lazy" decoding="async"><span class="tcode">00:07:37</span><span class="play"><svg class="ic"><use href="#i-play"/></svg></span></button>
-        <div class="cap"><span class="n">S1</span><span><b>동아리 마스터의 호기로운 크루생활 레시피 ep.1 | 애니미디어</b><small>서울영상고 공식 채널 · 2026</small></span></div>
-      </article>
-      <article class="work reveal" style="--d:0.15s">
-        <button class="shot vid" type="button" data-yt="2nVo4zBaSPY" aria-label="[기자단인터뷰] 당신이 생각하는 예술은 무엇인가요? 재생"><img src="https://i.ytimg.com/vi/2nVo4zBaSPY/mqdefault.jpg" alt="" loading="lazy" decoding="async"><span class="tcode">00:06:26</span><span class="play"><svg class="ic"><use href="#i-play"/></svg></span></button>
-        <div class="cap"><span class="n">S2</span><span><b>[기자단인터뷰] 당신이 생각하는 예술은 무엇인가요?</b><small>서울영상고 공식 채널 · 2025</small></span></div>
-      </article>
+        <p class="mono asof">머어엉 숏폼 중 일부 · 2026.11 기준 조회수</p>
       </div>
+    </article>
+    <article class="case">
+      <div class="case-info">
+        <div class="case-hd reveal"><span class="case-no">CASE 02</span><span class="mono">2025</span></div>
+        <h3 class="case-t reveal">유튜버 호영 숏폼 · 부채널 편집</h3>
+        <dl class="case-dl reveal"><div><dt>누구와</dt><dd>구독자 약 30만 유튜버 <b>호영</b></dd></div><div><dt>맡은 일</dt><dd>숏폼 채널 편집, 부채널 편집</dd></div><div><dt>어떻게</dt><dd>구독자 약 2천 명이던 숏폼 채널을 넘겨받아 맡고, 부채널 편집을 함께 진행했습니다.</dd></div><div><dt>결과</dt><dd>숏폼 채널 구독자 약 6.6배 성장, 100만 조회수 영상 배출</dd></div></dl>
+      </div>
+      <div class="case-media"><ul class="board glass reveal"><li><em>2천 <small>→</small> 1.32만</em><span>숏폼 채널 구독자</span></li><li><em>600만</em><span>부채널 편집 영상 최고 조회수</span></li><li><em>100만+ 2편</em><span>숏폼 채널 영상</span></li></ul></div>
+    </article>
+    <article class="case">
+      <div class="case-info">
+        <div class="case-hd reveal"><span class="case-no">CASE 03</span><span class="mono">2025</span></div>
+        <h3 class="case-t reveal">십세들 × THE SMC 롱폼 예능</h3>
+        <dl class="case-dl reveal"><div><dt>누구와</dt><dd><b>THE SMC</b> 그룹 · 채널 <b>십세들</b></dd></div><div><dt>맡은 일</dt><dd>롱폼 예능 촬영 참여, 그중 1편 편집</dd></div><div><dt>어떻게</dt><dd>재학 중 협업으로 참여해 여러 편의 촬영에 함께하고, 1편은 직접 편집했습니다.</dd></div><div><dt>결과</dt><dd>9분 분량 롱폼 예능 1편 공개</dd></div></dl>
+      </div>
+      <div class="case-media"><div class="frames">
+      <article class="work reveal" style="--d:0s">
+        <button class="shot vid" type="button" data-yt="tVBkHFC2QrU" aria-label="도파민 터지는 10대들의 20대 로망 재생">
+          <img src="https://i.ytimg.com/vi/tVBkHFC2QrU/hq720.jpg" alt="" loading="lazy" decoding="async"><span class="tcode">00:09:06</span><span class="play"><svg class="ic"><use href="#i-play"/></svg></span>
+        </button>
+        <div class="cap"><span class="n">01</span><span><b>도파민 터지는 10대들의 20대 로망</b><small>십세들 × THE SMC · 롱폼 예능 · 2025</small><small>협업 촬영 참여 · 편집</small></span></div>
+      </article>
+      </div></div>
+    </article>
+    <article class="case">
+      <div class="case-info">
+        <div class="case-hd reveal"><span class="case-no">CASE 04</span><span class="mono">2025 – 2026</span></div>
+        <h3 class="case-t reveal">서울영상고 공식 채널 편집</h3>
+        <dl class="case-dl reveal"><div><dt>누구와</dt><dd>서울영상고 공식 유튜브 채널 <b>@svmhs</b></dd></div><div><dt>맡은 일</dt><dd>학교 홍보부 편집 부서 부장 · 숏폼과 롱폼 편집</dd></div><div><dt>어떻게</dt><dd>학교 공식 채널에 올라가는 영상을 혼자 편집해 직접 업로드했습니다.</dd></div><div><dt>결과</dt><dd>영상제 스케치 필름, 동아리 소개, 인터뷰 등 공식 채널 영상 공개</dd></div></dl>
+      </div>
+      <div class="case-media"><div class="frames lead">
+      <article class="work reveal" style="--d:0s">
+        <button class="shot vid" type="button" data-yt="Ml9TuL5-6ak" aria-label="2026 서울영상축제 Sketch Film 재생">
+          <img src="https://i.ytimg.com/vi/Ml9TuL5-6ak/hq720.jpg" alt="" loading="lazy" decoding="async"><span class="tcode">00:03:19</span><span class="play"><svg class="ic"><use href="#i-play"/></svg></span>
+        </button>
+        <div class="cap"><span class="n">01</span><span><b>2026 서울영상축제 Sketch Film</b><small>서울영상고 공식 채널 · 2026</small><small>편집부장 재직 중 편집</small></span></div>
+      </article>
+      <article class="work reveal" style="--d:.1s">
+        <button class="shot vid" type="button" data-yt="nx2MNQi0nHU" aria-label="동아리 마스터의 호기로운 크루생활 레시피 ep.1 | 애니미디어 재생"><img src="https://i.ytimg.com/vi/nx2MNQi0nHU/hqdefault.jpg" alt="" loading="lazy" decoding="async"><span class="tcode">00:07:37</span><span class="play"><svg class="ic"><use href="#i-play"/></svg></span></button>
+        <div class="cap"><span class="n">02</span><span><b>동아리 마스터의 호기로운 크루생활 레시피 ep.1 | 애니미디어</b><small>서울영상고 공식 채널 · 2026</small></span></div>
+      </article>
+      <article class="work reveal" style="--d:.2s">
+        <button class="shot vid" type="button" data-yt="2nVo4zBaSPY" aria-label="[기자단인터뷰] 당신이 생각하는 예술은 무엇인가요? 재생"><img src="https://i.ytimg.com/vi/2nVo4zBaSPY/mqdefault.jpg" alt="" loading="lazy" decoding="async"><span class="tcode">00:06:26</span><span class="play"><svg class="ic"><use href="#i-play"/></svg></span></button>
+        <div class="cap"><span class="n">03</span><span><b>[기자단인터뷰] 당신이 생각하는 예술은 무엇인가요?</b><small>서울영상고 공식 채널 · 2025</small></span></div>
+      </article>
+      
+      </div></div>
+    </article>
+    <article class="case">
+      <div class="case-info">
+        <div class="case-hd reveal"><span class="case-no">CASE 05</span><span class="mono">2024 –</span></div>
+        <h3 class="case-t reveal">프리랜서 유튜브 편집</h3>
+        <dl class="case-dl reveal"><div><dt>누구와</dt><dd>아트머그 의뢰인, 직접 연락한 유튜버</dd></div><div><dt>맡은 일</dt><dd>유튜브 롱폼 · 숏폼 편집</dd></div><div><dt>어떻게</dt><dd>아트머그에서 외주 3건을 진행하고, 직접 메일로 제안해 유튜브 편집 외주 2건을 각 약 3개월간 맡았습니다.</dd></div><div><dt>결과</dt><dd>아트머그 정기 외주가 MCN 전담 편집(CASE 01)으로 이어졌습니다.</dd></div></dl>
+      </div>
+      <div class="case-media"><ul class="board glass reveal"><li><em>5건</em><span>프리랜서 외주</span></li><li><em>약 3개월</em><span>직접 제안한 장기 외주 2건 각각</span></li><li><em><small>→</small> MCN</em><span>정기 외주에서 전담 편집자로</span></li></ul></div>
+    </article>
     </div>
   </section>
 
@@ -674,8 +732,24 @@
     <p class="mono asof reveal" id="statsAsof">2026.09.30 00:00 기준</p>
   </section>
 
+  <section class="sec" id="process">
+    <h2 class="label reveal"><span class="no">04</span>작업 방식</h2>
+    <div class="rule"></div>
+    <p class="note reveal">편집을 맡겨 주시면 이렇게 진행합니다.</p>
+    <ol class="steps">
+      <li class="glass reveal" style="--d:0s"><span class="q">01</span><h3>의도 파악</h3><p>영상의 의도와 목적을 먼저 파악합니다.</p></li>
+      <li class="glass reveal" style="--d:.12s"><span class="q">02</span><h3>취사선택</h3><p>무엇을 남기고 무엇을 덜어낼지 정합니다.</p></li>
+      <li class="glass reveal" style="--d:.24s"><span class="q">03</span><h3>구성</h3><p>순서와 호흡, 리듬, 전환을 설계합니다.</p></li>
+      <li class="glass reveal" style="--d:.36s"><span class="q">04</span><h3>완성</h3><p>최종적인 영상 언어로 다듬어 마무리합니다.</p></li>
+    </ol>
+    <div class="cta glass reveal">
+      <p><b>맡기고 싶은 영상이 있으신가요?</b><span>작업 가능한 날짜를 고르고 바로 문의하실 수 있습니다.</span></p>
+      <a class="btn-glass" href="#contact"><svg class="ic"><use href="#i-mail"/></svg>의뢰 문의하기</a>
+    </div>
+  </section>
+
   <section class="sec aura left" id="contact">
-    <h2 class="label reveal"><span class="no">04</span>문의</h2>
+    <h2 class="label reveal"><span class="no">05</span>문의</h2>
     <div class="rule"></div>
     <p class="big"><span class="ln" style="--d:0s"><span>함께할 일이 있다면</span></span><span class="ln" style="--d:.12s"><span>편하게 연락 주세요.</span></span></p>
     <p class="note reveal">작업 시작을 희망하시는 날짜를 선택해 주시면, 해당 날짜가 기재된 문의 메일을 바로 보내실 수 있습니다.</p>
