@@ -421,7 +421,7 @@
   @keyframes c1push { from { transform:translateX(var(--dx,6%)) scale(var(--s0,1.06)); } }
   .c1-hold .c1-w { animation:c1hold 1.2s cubic-bezier(.2,.7,.2,1) both; }
   @keyframes c1hold { from { transform:scale(.94); letter-spacing:.02em; opacity:.0; } 18% { opacity:1; } to { transform:scale(1.03); } }
-  .c1-out { -webkit-text-stroke:2px #fff; color:transparent !important; } /* currentColor는 transparent가 되어 외곽선이 안 보이던 문제 수정 */
+  .c1-out { -webkit-text-stroke:4px #fff; paint-order:stroke fill; color:#07070a !important; } /* 글자 획이 겹치는 안쪽 선은 배경색 채움으로 덮고 바깥 외곽선만 남김 */ /* currentColor는 transparent가 되어 외곽선이 안 보이던 문제 수정 */
   .c1-bars { position:absolute; inset:18% 0; display:flex; flex-direction:column; gap:3%; }
   .c1-bars div { flex:1; display:flex; gap:1%; } .c1-bars i { display:block; border-radius:4px; }
   .c1-hud { position:absolute; inset:0; pointer-events:none; mix-blend-mode:difference; color:#fff; font-family:var(--mono); font-size:11px; letter-spacing:.18em; z-index:2; }
