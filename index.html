@@ -1186,7 +1186,7 @@
   if ('ResizeObserver' in window) { var roT = 0; new ResizeObserver(function () { if (!roT) roT = requestAnimationFrame(function () { roT = 0; relayout(); }); }).observe(document.body); }
   move();
 
-  // 첫 진입 인트로: 재생 헤드가 끝까지 훑으며 클립이 차례로 '찍히고', 타임라인 끝까지 쭉 가서 사라진 뒤 현재 위치에서 페이드인 (1회)
+  // 첫 진입 인트로: 재생 헤드가 끝까지 훑으며 클립이 차례로 '찍히고', 타임라인 끝선 너머로 들어가듯 사라진 뒤 현재 위치에서 페이드인 (1회)
   (function () {
     var tl = document.querySelector('.timeline'); if (!tl) return;
     var clips = [].slice.call(tl.querySelectorAll('.track i')), tcs = [].slice.call(tl.querySelectorAll('.tcs span'));
@@ -1207,14 +1207,16 @@
       var r = tl.getBoundingClientRect(), w = r.width || 1;
       var cx = clips.map(function (c) { return (c.getBoundingClientRect().left - r.left) / w; });
       var tx = tcs.map(function (c) { var b = c.getBoundingClientRect(); return (b.left + b.width / 2 - r.left) / w; });
-      // 속도를 줄이지 않고 타임라인 끝(01:00)을 그대로 통과하며, 끝선에 닿는 순간 사라짐
-      var qEnd = 1.12;
+      // 타임라인 끝선 너머로 미끄러져 들어가듯 사라짐: 끝선 밖으로 나간 부분만 잘라내며(흐려짐 없음) 서서히 감속
+      var over = 220, qEnd = 1 + over / (w * 0.994);
       var T1 = 1500 * Math.pow(qEnd, 0.6), t0 = performance.now();
       phX = 0;
       requestAnimationFrame(function frame(now) {
         var t = now - t0;
-        var q = qEnd * ease(Math.min(1, t / T1));
-        if (q >= 1) { ph.style.opacity = '0'; finish(); return; }
+        if (t >= T1) { ph.style.opacity = '0'; ph.style.removeProperty('clip-path'); finish(); return; }
+        var q = qEnd * ease(t / T1);
+        var out = (0.003 + q * 0.994) * w + 2 - w; // 끝선을 넘어간 거리(px)
+        ph.style.clipPath = out > 0 ? 'inset(-80px ' + out.toFixed(1) + 'px -80px -' + (over + 200) + 'px)' : '';
         phX = q;
         var x = 0.003 + q * 0.994;
         setPh(x); setFlip(q > 0.82);
