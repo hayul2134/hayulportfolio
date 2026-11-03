@@ -31,6 +31,7 @@
     if (t !== 'light' && t !== 'dark') t = window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
     d.setAttribute('data-theme', t);
     d.classList.add('js');
+    if (!location.hash) d.classList.add('intro-on'); // 첫 화면 오프닝 시퀀스
   })();
 </script>
 <style>
@@ -342,6 +343,68 @@
   }
   .js .timeline.flash { animation:tlFlash .9s ease-out; }
   @keyframes tlFlash { 0% { border-top-color:var(--accent); box-shadow:0 -1px 18px -4px var(--accent); } 100% { box-shadow:0 0 0 transparent; } }
+  /* ── 오프닝 시퀀스: 거대한 편집 타임라인이 채워지고, 한 줄로 접혀 화면이 갈라지며 사이트가 열림 ── */
+  html.intro-on { overflow:hidden; }
+  html.intro-on body::after { content:""; position:fixed; inset:0; z-index:99; background:#07070a; }
+  html.intro-on .ln > span { transform:translateY(105%) !important; }
+  html.intro-on .hero .reveal { opacity:0 !important; transform:translateY(28px) !important; }
+  html.intro-on header { opacity:0; transform:translateY(-24px); }
+  header { transition:opacity .9s .45s, transform .9s .45s cubic-bezier(.2,.7,.2,1); }
+  .ix { position:fixed; inset:0; z-index:100; overflow:hidden; color:#f0efea; font-family:var(--mono); cursor:pointer; -webkit-user-select:none; user-select:none; }
+  .ix::after { content:""; position:absolute; inset:0; pointer-events:none; background:radial-gradient(ellipse at center, transparent 45%, rgba(0,0,0,.75)); transition:opacity .5s; }
+  .ix-pan { position:absolute; left:0; right:0; height:50.5%; background:#07070a; transition:transform 1.05s cubic-bezier(.76,0,.16,1); }
+  .ix-top { top:0; } .ix-bot { bottom:0; }
+  .ix-glow { position:absolute; inset:-20%; opacity:0; animation:ixIn 1.4s .1s forwards; transition:opacity .5s;
+             background:radial-gradient(45% 38% at 50% 55%, rgba(47,91,255,.34), transparent 70%), radial-gradient(28% 24% at 76% 32%, rgba(255,95,174,.16), transparent 70%); }
+  .ix-cam { position:absolute; left:50%; top:53%; width:min(1500px,150vw); animation:ixCam 2.7s cubic-bezier(.16,.8,.2,1) forwards; }
+  @keyframes ixCam { from { transform:translate(-50%,-50%) perspective(1400px) rotateX(52deg) rotateZ(-11deg) scale(1.75); }
+                     to   { transform:translate(-50%,-50%) perspective(1400px) rotateX(20deg) rotateZ(-4deg) scale(1); } }
+  @keyframes ixIn { to { opacity:1; } }
+  .ix-stage { position:relative; transform-origin:50% 50%; transition:transform .42s cubic-bezier(.7,0,.3,1), opacity .25s .2s; }
+  .ix-ruler { position:relative; height:34px; margin-left:58px; border-bottom:1px solid rgba(255,255,255,.2);
+              background:repeating-linear-gradient(to right, rgba(255,255,255,.3) 0 1px, transparent 1px 1.25%) bottom/100% 8px no-repeat; }
+  .ix-ruler span { position:absolute; top:3px; padding-left:5px; font-size:11px; letter-spacing:.06em; color:rgba(255,255,255,.5); border-left:1px solid rgba(255,255,255,.35); line-height:1; transition:color .3s; }
+  .ix-ruler span.hit { color:#9fb4ff; }
+  .ix-tr { display:flex; align-items:center; gap:12px; height:clamp(24px,4.4vh,46px); margin-top:6px; animation:ixLane .8s cubic-bezier(.2,.7,.2,1) backwards; animation-delay:calc(var(--k) * 55ms); }
+  @keyframes ixLane { from { opacity:0; transform:translateX(22%); } }
+  .ix-lab { width:46px; flex:none; font-size:11px; letter-spacing:.08em; color:rgba(255,255,255,.45); text-align:right; }
+  .ix-row { flex:1; display:flex; gap:4px; height:100%; border-radius:5px; background:rgba(255,255,255,.035); }
+  .ix-row b { display:block; }
+  .ix-row i { display:block; border-radius:5px; background:rgba(255,255,255,.15); transform:scaleX(0); transform-origin:left; }
+  .ix-row i.s { background:rgba(255,255,255,.28); } .ix-row i.a { background:#2f5bff; } .ix-row i.p { background:#ff5fae; }
+  .ix-tr.au .ix-row i { background-color:rgba(61,220,151,.22);
+    background-image:repeating-linear-gradient(90deg, rgba(120,255,190,.55) 0 1px, transparent 1px 4px);
+    -webkit-mask:linear-gradient(transparent, #000 25%, #000 75%, transparent); mask:linear-gradient(transparent, #000 25%, #000 75%, transparent); }
+  .ix-row i.hit { transform:none; animation:ixHit .6s cubic-bezier(.2,.9,.25,1.2) backwards; }
+  @keyframes ixHit { 0% { transform:scaleX(0) scaleY(1.9); background-color:#fff; box-shadow:0 0 34px #7f9cff; }
+                     35% { transform:scaleX(1.02) scaleY(1.15); box-shadow:0 0 22px #2f5bff; }
+                     100% { transform:none; box-shadow:0 0 0 transparent; } }
+  .ix-area { position:absolute; top:0; bottom:0; left:58px; right:0; pointer-events:none; }
+  .ix-ph { position:absolute; top:0; bottom:-14px; left:0; width:2px; margin-left:-1px; background:#a9bcff; box-shadow:0 0 12px #2f5bff, 0 0 44px #2f5bff; }
+  .ix-ph::before { content:""; position:absolute; top:34px; bottom:0; right:2px; width:min(320px,30vw); background:linear-gradient(to right, transparent, rgba(47,91,255,.3)); }
+  .ix-ph::after { content:""; position:absolute; top:-4px; left:-7px; border:8px solid transparent; border-top:11px solid #a9bcff; border-bottom:0; }
+  .ix-tc { position:absolute; left:50%; top:8%; transform:translateX(-50%); text-align:center; white-space:nowrap; transition:opacity .35s, filter .35s, transform .35s; animation:ixUp .8s .15s cubic-bezier(.2,.7,.2,1) backwards; }
+  @keyframes ixUp { from { opacity:0; transform:translateX(-50%) translateY(16px); } }
+  .ix-tc small { display:block; font-size:11px; letter-spacing:.32em; color:rgba(255,255,255,.5); margin-bottom:10px; }
+  .ix-tc b { display:block; font-size:clamp(2.2rem,8.5vw,6.6rem); font-weight:600; line-height:1; letter-spacing:.02em; color:#fff; font-variant-numeric:tabular-nums;
+             text-shadow:0 0 34px rgba(47,91,255,.75), 0 0 2px rgba(255,255,255,.6); }
+  .ix-seam { position:absolute; left:0; right:0; top:50%; height:2px; margin-top:-1px; background:#fff; transform:scaleX(0);
+             box-shadow:0 0 18px #7f9cff, 0 0 60px #2f5bff, 0 0 120px #2f5bff; transition:transform .5s cubic-bezier(.7,0,.2,1), opacity .7s .25s; }
+  .ix-foot { position:absolute; left:var(--pad); right:var(--pad); bottom:26px; display:flex; justify-content:space-between; gap:12px; font-size:11px; letter-spacing:.18em; color:rgba(255,255,255,.5); transition:opacity .3s; }
+  .ix-pct { font-variant-numeric:tabular-nums; color:rgba(255,255,255,.8); }
+  .ix-skip { position:absolute; top:24px; right:var(--pad); padding:7px 15px; border-radius:999px; border:1px solid rgba(255,255,255,.22); background:rgba(255,255,255,.04);
+             color:rgba(255,255,255,.7); font:inherit; font-size:11px; letter-spacing:.18em; cursor:pointer; transition:opacity .3s; }
+  .ix.ix-end .ix-stage { transform:scaleY(.008); opacity:0; }
+  .ix.ix-end .ix-row i { animation:ixWhite .3s ease-out; }
+  @keyframes ixWhite { 40% { filter:brightness(2.6); } }
+  .ix.ix-end .ix-tc { opacity:0; filter:blur(8px); transform:translateX(-50%) scale(1.12); }
+  .ix.ix-end .ix-foot, .ix.ix-end .ix-skip { opacity:0; }
+  .ix.ix-end .ix-seam { transform:none; }
+  .ix.ix-open { cursor:default; pointer-events:none; }
+  .ix.ix-open .ix-top { transform:translateY(-101%); } .ix.ix-open .ix-bot { transform:translateY(101%); }
+  .ix.ix-open .ix-seam, .ix.ix-open::after { opacity:0; }
+  .ix.ix-open .ix-glow { animation:ixOut .7s forwards; }
+  @keyframes ixOut { from { opacity:1; } to { opacity:0; } }
   /* 윈도우·맥 동일 렌더링: 얇은 스크롤바, 같은 글꼴 굵기 처리 */
   html { scrollbar-width:thin; scrollbar-color:rgba(127,127,127,.45) transparent; -webkit-text-size-adjust:100%; text-size-adjust:100%; }
   ::-webkit-scrollbar { width:8px; height:8px; } ::-webkit-scrollbar-track { background:transparent; }
@@ -568,6 +631,81 @@
 </main>
 
 <script>
+  // ── 오프닝 시퀀스 ──
+  var introDone = !document.documentElement.classList.contains('intro-on'), introWait = [];
+  function afterIntro(fn) { if (introDone) fn(); else introWait.push(fn); }
+  (function () {
+    if (introDone) return;
+    var root = document.documentElement;
+    try { history.scrollRestoration = 'manual'; } catch (e) {}
+    window.scrollTo(0, 0);
+    function rnd(a, b) { return a + Math.random() * (b - a); }
+    var TR = ['V4','V3','V2','V1','A1','A2','A3'], h = '';
+    h += '<div class="ix-pan ix-top"></div><div class="ix-pan ix-bot"></div><div class="ix-glow"></div><div class="ix-cam"><div class="ix-stage"><div class="ix-ruler">';
+    for (var m = 0; m < 6; m++) h += '<span style="left:' + (m * 100 / 6) + '%">00:0' + m + ':00</span>';
+    h += '</div>';
+    TR.forEach(function (name, k) {
+      var au = name[0] === 'A', row = '', left = 100;
+      while (left > 4) {
+        if (Math.random() < .22) { var g = Math.min(left, rnd(2, 6)); row += '<b style="flex:' + g.toFixed(1) + '"></b>'; left -= g; continue; }
+        var w = Math.min(left, rnd(5, au ? 26 : 18)), r = Math.random();
+        var c = au ? '' : r < .2 ? 'a' : r < .3 ? 'p' : r < .55 ? 's' : '';
+        row += '<i class="' + c + '" style="flex:' + w.toFixed(1) + '"></i>'; left -= w;
+      }
+      h += '<div class="ix-tr' + (au ? ' au' : '') + '" style="--k:' + k + '"><span class="ix-lab">' + name + '</span><div class="ix-row">' + row + '</div></div>';
+    });
+    h += '<div class="ix-area"><div class="ix-ph"></div></div></div></div>';
+    h += '<div class="ix-tc"><small>SEQUENCE 01 — HAYUL</small><b>00:00:00:00</b></div><div class="ix-seam"></div>';
+    h += '<div class="ix-foot"><span>편집도 기획입니다</span><span class="ix-pct">000%</span></div><button class="ix-skip" type="button">SKIP</button>';
+    var ix = document.createElement('div'); ix.className = 'ix'; ix.setAttribute('aria-hidden', 'true'); ix.innerHTML = h;
+    document.body.appendChild(ix);
+    var ph = ix.querySelector('.ix-ph'), tc = ix.querySelector('.ix-tc b'), pct = ix.querySelector('.ix-pct');
+    var clips = [].slice.call(ix.querySelectorAll('.ix-row i')), marks = [].slice.call(ix.querySelectorAll('.ix-ruler span'));
+    var pos = null, stage = 0, timers = [];
+    function p2(n) { return (n < 10 ? '0' : '') + n; }
+    function measure() {
+      var a = ix.querySelector('.ix-area'), w = a.offsetWidth || 1;
+      // 3D 변형 전 레이아웃 기준 위치(offsetLeft)로 계산
+      pos = clips.map(function (c) { var r = c.parentNode; return (c.offsetLeft - r.offsetLeft) / r.offsetWidth; });
+      marks.forEach(function (s) { s._x = parseFloat(s.style.left) / 100; });
+    }
+    function ease(t) { return t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; }
+    function sweep() {
+      measure(); var T = 1900, t0 = performance.now();
+      requestAnimationFrame(function f(now) {
+        if (stage > 1) return;
+        var k = Math.min(1, (now - t0) / T), q = ease(k);
+        ph.style.left = q * 100 + '%';
+        clips.forEach(function (c, i) { if (q >= pos[i] && !c._h) { c._h = 1; c.classList.add('hit'); } });
+        marks.forEach(function (s) { if (q >= s._x) s.classList.add('hit'); });
+        var sec = q * 360, s = Math.floor(sec);
+        tc.textContent = '00:' + p2(Math.floor(s / 60)) + ':' + p2(s % 60) + ':' + p2(Math.floor((sec - s) * 30));
+        pct.textContent = ('00' + Math.round(q * 100)).slice(-3) + '%';
+        if (k < 1) requestAnimationFrame(f); else timers.push(setTimeout(end, 120));
+      });
+    }
+    function end() {
+      if (stage > 1) return; stage = 2;
+      clips.forEach(function (c) { c.classList.add('hit'); });
+      ix.classList.add('ix-end');
+      timers.push(setTimeout(open, 480));
+    }
+    function open() {
+      if (stage > 2) return; stage = 3;
+      timers.forEach(clearTimeout);
+      ix.classList.add('ix-end', 'ix-open');
+      root.classList.remove('intro-on');
+      introDone = true; introWait.splice(0).forEach(function (fn) { fn(); });
+      setTimeout(function () { ix.remove(); }, 1200);
+    }
+    function skip(e) { if (stage < 3) { if (e && e.type === 'wheel') e.preventDefault(); open(); } }
+    ix.addEventListener('click', skip);
+    ix.addEventListener('wheel', skip, { passive: false });
+    ix.addEventListener('touchstart', skip, { passive: true });
+    window.addEventListener('keydown', function k(e) { window.removeEventListener('keydown', k); skip(); });
+    timers.push(setTimeout(function () { stage = 1; sweep(); }, 420));
+  })();
+
   var root = document.documentElement;
   var themeBtn = document.getElementById('themeBtn');
   var still0 = false; // OS의 '애니메이션 줄이기' 설정과 무관하게 맥과 같은 애니메이션
@@ -779,7 +917,7 @@
     }
     if (!('IntersectionObserver' in window)) { setTimeout(run, 950); return; }
     var o = new IntersectionObserver(function (es) {
-      if (es[0].isIntersecting) { o.disconnect(); setTimeout(run, 950); }
+      if (es[0].isIntersecting) { o.disconnect(); afterIntro(function () { setTimeout(run, 1150); }); }
     }, { threshold: 0.3 });
     o.observe(tl);
   })();
