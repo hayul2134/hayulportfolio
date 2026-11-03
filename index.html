@@ -1113,29 +1113,32 @@
   window.addEventListener('load', function () { placeBg(); move(); });
   move();
 
-  // 첫 진입 인트로: 재생 헤드가 끝까지 훑으며 클립이 차례로 '찍히고', 되감겨 현재 스크롤 위치로 돌아옴 (1회)
+  // 첫 진입 인트로: 재생 헤드가 끝까지 훑으며 클립이 차례로 '찍히고', 오른쪽으로 빠져나가 사라진 뒤 현재 위치에서 페이드인 (1회)
   (function () {
     var tl = document.querySelector('.timeline'); if (!tl) return;
     var clips = [].slice.call(tl.querySelectorAll('.track i')), tcs = [].slice.call(tl.querySelectorAll('.tcs span'));
     tl.classList.add('intro');
     function ease(t) { return t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; }
-    function scrollP() { var m = document.documentElement.scrollHeight - innerHeight; return m > 0 ? Math.max(0, Math.min(1, scrollY / m)) : 0; }
     function finish() {
       phX = null; tl.classList.remove('intro'); tl.style.removeProperty('--x');
       clips.concat(tcs).forEach(function (e) { e.classList.remove('hit'); });
       tl.classList.add('flash'); setTimeout(function () { tl.classList.remove('flash'); }, 950);
-      move();
+      // 오른쪽 끝으로 빠져나가 사라진 재생 헤드를 현재 위치에 두고 페이드인
+      ph.style.transition = 'none'; ph.style.opacity = '0';
+      move(); void ph.offsetWidth;
+      ph.style.transition = 'opacity .5s ease, box-shadow .5s'; ph.style.opacity = '1';
+      setTimeout(function () { ph.style.removeProperty('transition'); ph.style.removeProperty('opacity'); }, 550);
     }
     function run() {
       var r = tl.getBoundingClientRect(), w = r.width || 1;
       var cx = clips.map(function (c) { return (c.getBoundingClientRect().left - r.left) / w; });
       var tx = tcs.map(function (c) { var b = c.getBoundingClientRect(); return (b.left + b.width / 2 - r.left) / w; });
-      var T1 = 1500, T2 = 520, t0 = performance.now();
+      var T1 = 1500, T2 = 380, t0 = performance.now();
       phX = 0;
       requestAnimationFrame(function frame(now) {
         var t = now - t0, q;
         if (t < T1) q = ease(t / T1);
-        else if (t < T1 + T2) { var k = (t - T1) / T2; q = 1 + (scrollP() - 1) * (1 - Math.pow(1 - k, 4)); }
+        else if (t < T1 + T2) { var k = (t - T1) / T2; q = 1 + 0.06 * k; ph.style.opacity = (1 - k).toFixed(3); }
         else { finish(); return; }
         phX = q;
         var x = 0.003 + q * 0.994;
@@ -1145,7 +1148,7 @@
           cx.forEach(function (v, i) { if (x >= v) clips[i].classList.add('hit'); });
           tx.forEach(function (v, i) { if (x >= v) tcs[i].classList.add('hit'); });
         }
-        var sec = q * 60, s = Math.floor(sec);
+        var sec = Math.min(q, 1) * 60, s = Math.floor(sec);
         tcEl.textContent = pad(Math.floor(s / 60)) + ':' + pad(s % 60) + ':' + pad(Math.floor((sec - s) * 30));
         requestAnimationFrame(frame);
       });
