@@ -321,6 +321,27 @@
   .js .rule.in { transform:none; }
   .js .track i { transform:scaleX(0); transform-origin:left; transition:transform .7s cubic-bezier(.2,.7,.2,1); }
   .js .timeline.in .track i { transform:none; transition-delay:calc(var(--base,0s) + var(--i,0) * .07s); }
+  /* 첫 진입 인트로: 재생 헤드가 타임라인을 훑으며 클립을 '찍어' 깔고, 되감겨 제자리로 */
+  .ruler { position:relative; }
+  .ruler::after { content:""; position:absolute; inset:0; pointer-events:none; opacity:0; transition:opacity .6s;
+                  background:repeating-linear-gradient(to right, var(--accent) 0 1px, transparent 1px 2%); clip-path:inset(0 calc(100% - var(--x,0%)) 0 0); }
+  .playhead::before { content:""; position:absolute; top:0; bottom:0; right:2px; width:min(180px,30vw); pointer-events:none; opacity:0; transition:opacity .5s;
+                      background:linear-gradient(to right, transparent, var(--glow)); background:linear-gradient(to right, transparent, color-mix(in srgb, var(--accent) 38%, transparent)); }
+  .playhead, .playhead b { transition:box-shadow .5s; }
+  .js .timeline.intro .ruler::after, .js .timeline.intro .playhead::before { opacity:1; }
+  .js .timeline.intro .playhead { box-shadow:0 0 10px var(--accent), 0 0 26px var(--accent); }
+  .js .timeline.intro .playhead b { box-shadow:0 0 18px var(--accent); }
+  .tcs span { transition:color .4s; }
+  .js .timeline.intro .tcs span.hit { color:var(--accent); }
+  .js .timeline.intro .track i { transform:scaleX(0); transition:none; }
+  .js .timeline.intro .track i.hit { animation:clipIn .6s cubic-bezier(.2,.9,.25,1.2) forwards; }
+  @keyframes clipIn {
+    0%   { transform:scaleX(0) scaleY(1.7); background:var(--accent); box-shadow:0 0 20px var(--accent); }
+    40%  { transform:scaleX(1.03) scaleY(1.2); background:var(--accent); box-shadow:0 0 14px var(--accent); }
+    100% { transform:none; box-shadow:0 0 0 transparent; }
+  }
+  .js .timeline.flash { animation:tlFlash .9s ease-out; }
+  @keyframes tlFlash { 0% { border-top-color:var(--accent); box-shadow:0 -1px 18px -4px var(--accent); } 100% { box-shadow:0 0 0 transparent; } }
   /* 윈도우·맥 동일 렌더링: 얇은 스크롤바, 같은 글꼴 굵기 처리 */
   html { scrollbar-width:thin; scrollbar-color:rgba(127,127,127,.45) transparent; -webkit-text-size-adjust:100%; text-size-adjust:100%; }
   ::-webkit-scrollbar { width:8px; height:8px; } ::-webkit-scrollbar-track { background:transparent; }
@@ -371,7 +392,7 @@
       </h1>
       <p class="lead reveal" style="--d:.5s">좋은 편집은 잘 자르는 것에서 끝나지 않습니다.<br>무엇을 보여줄지, 언제 보여줄지, 어떻게 기억하게 할지까지 생각합니다.</p>
     </div>
-    <div class="timeline reveal" style="--d:.8s;--base:.9s" aria-hidden="true">
+    <div class="timeline reveal" style="--d:.55s;--base:.9s" aria-hidden="true">
       <div class="tcs mono"><span>00:00</span><span>00:10</span><span>00:20</span><span>00:30</span><span>00:40</span><span>00:50</span><span>01:00</span></div>
       <div class="ruler"></div>
       <div class="track"><i style="flex:3"></i><i class="a" style="flex:5"></i><i style="flex:2"></i><i class="s" style="flex:4"></i><i style="flex:3"></i></div>
@@ -703,12 +724,13 @@
 
   // 상단 진행 바와 재생 헤드(타임코드)는 페이지 스크롤 진행도에 맞춰 움직임
   var ph = document.querySelector('.playhead'), tcEl = ph.querySelector('b'), bar = document.querySelector('.progress');
-  var still = false;
+  var still = false, phX = null;
   function pad(n) { return (n < 10 ? '0' : '') + n; }
   function move() {
     var max = document.documentElement.scrollHeight - window.innerHeight;
     var p = max > 0 ? Math.max(0, Math.min(1, window.scrollY / max)) : 0;
     bar.style.setProperty('--p', p);
+    if (phX !== null) return; // 인트로 재생 중에는 인트로가 재생 헤드를 움직임
     var q = still ? 0.38 : p, s = Math.round(q * 60);
     ph.style.left = (0.3 + q * 99.4) + '%';
     ph.classList.toggle('flip', q > 0.82);
@@ -717,6 +739,50 @@
   window.addEventListener('scroll', function () { window.requestAnimationFrame(move); }, { passive:true });
   window.addEventListener('resize', move);
   move();
+
+  // 첫 진입 인트로: 재생 헤드가 끝까지 훑으며 클립이 차례로 '찍히고', 되감겨 현재 스크롤 위치로 돌아옴 (1회)
+  (function () {
+    var tl = document.querySelector('.timeline'); if (!tl) return;
+    var clips = [].slice.call(tl.querySelectorAll('.track i')), tcs = [].slice.call(tl.querySelectorAll('.tcs span'));
+    tl.classList.add('intro');
+    function ease(t) { return t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; }
+    function scrollP() { var m = document.documentElement.scrollHeight - innerHeight; return m > 0 ? Math.max(0, Math.min(1, scrollY / m)) : 0; }
+    function finish() {
+      phX = null; tl.classList.remove('intro'); tl.style.removeProperty('--x');
+      clips.concat(tcs).forEach(function (e) { e.classList.remove('hit'); });
+      tl.classList.add('flash'); setTimeout(function () { tl.classList.remove('flash'); }, 950);
+      move();
+    }
+    function run() {
+      var r = tl.getBoundingClientRect(), w = r.width || 1;
+      var cx = clips.map(function (c) { return (c.getBoundingClientRect().left - r.left) / w; });
+      var tx = tcs.map(function (c) { var b = c.getBoundingClientRect(); return (b.left + b.width / 2 - r.left) / w; });
+      var T1 = 1500, T2 = 520, t0 = performance.now();
+      phX = 0;
+      requestAnimationFrame(function frame(now) {
+        var t = now - t0, q;
+        if (t < T1) q = ease(t / T1);
+        else if (t < T1 + T2) { var k = (t - T1) / T2; q = 1 + (scrollP() - 1) * (1 - Math.pow(1 - k, 4)); }
+        else { finish(); return; }
+        phX = q;
+        var x = 0.003 + q * 0.994;
+        ph.style.left = x * 100 + '%'; ph.classList.toggle('flip', q > 0.82);
+        tl.style.setProperty('--x', x * 100 + '%');
+        if (t < T1) {
+          cx.forEach(function (v, i) { if (x >= v) clips[i].classList.add('hit'); });
+          tx.forEach(function (v, i) { if (x >= v) tcs[i].classList.add('hit'); });
+        }
+        var sec = q * 60, s = Math.floor(sec);
+        tcEl.textContent = pad(Math.floor(s / 60)) + ':' + pad(s % 60) + ':' + pad(Math.floor((sec - s) * 30));
+        requestAnimationFrame(frame);
+      });
+    }
+    if (!('IntersectionObserver' in window)) { setTimeout(run, 950); return; }
+    var o = new IntersectionObserver(function (es) {
+      if (es[0].isIntersecting) { o.disconnect(); setTimeout(run, 950); }
+    }, { threshold: 0.3 });
+    o.observe(tl);
+  })();
 
   // 이메일 복사
   document.querySelectorAll('.copy').forEach(function (b) {
