@@ -683,7 +683,7 @@
   (function () {
     if (introDone) return;
     // 기본 오프닝 번호: 0 기존 3D 타임라인 / 1 CUT 몽타주 / 2 필름 리더 / 3 프레임 줌아웃 (주소 뒤 ?intro=번호 로 미리보기)
-    var qv = (location.search.match(/[?&]intro=(\d)/) || [])[1], V = qv != null ? +qv : 1;
+    var qv = (location.search.match(/[?&]intro=(\d)/) || [])[1], V = qv != null ? +qv : 2;
     if (V >= 1 && V <= 3) { introAlt(V); return; }
     var root = document.documentElement;
     try { history.scrollRestoration = 'manual'; } catch (e) {}
