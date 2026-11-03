@@ -1199,8 +1199,9 @@
       // 끝에서 사라진 재생 헤드를 현재 위치에 두고 페이드인
       ph.style.transition = 'none'; ph.style.opacity = '0';
       move(); void ph.offsetWidth;
-      ph.style.transition = 'opacity .5s ease, box-shadow .5s'; ph.style.opacity = '1';
-      setTimeout(function () { ph.style.removeProperty('transition'); ph.style.removeProperty('opacity'); }, 550);
+      // 잠깐 비워 둔 뒤 천천히 페이드인
+      ph.style.transition = 'opacity 1.4s ease .25s, box-shadow .5s'; ph.style.opacity = '1';
+      setTimeout(function () { ph.style.removeProperty('transition'); ph.style.removeProperty('opacity'); }, 1750);
     }
     function run() {
       var r = tl.getBoundingClientRect(), w = r.width || 1;
