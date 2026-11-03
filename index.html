@@ -1186,7 +1186,7 @@
   if ('ResizeObserver' in window) { var roT = 0; new ResizeObserver(function () { if (!roT) roT = requestAnimationFrame(function () { roT = 0; relayout(); }); }).observe(document.body); }
   move();
 
-  // 첫 진입 인트로: 재생 헤드가 끝까지 훑으며 클립이 차례로 '찍히고', 오른쪽으로 빠져나가 사라진 뒤 현재 위치에서 페이드인 (1회)
+  // 첫 진입 인트로: 재생 헤드가 끝까지 훑으며 클립이 차례로 '찍히고', 화면 오른쪽 밖으로 쭉 빠져나간 뒤 현재 위치에서 페이드인 (1회)
   (function () {
     var tl = document.querySelector('.timeline'); if (!tl) return;
     var clips = [].slice.call(tl.querySelectorAll('.track i')), tcs = [].slice.call(tl.querySelectorAll('.tcs span'));
@@ -1196,7 +1196,7 @@
       phX = null; tl.classList.remove('intro'); tl.style.removeProperty('--x');
       clips.concat(tcs).forEach(function (e) { e.classList.remove('hit'); });
       tl.classList.add('flash'); setTimeout(function () { tl.classList.remove('flash'); }, 950);
-      // 오른쪽 끝으로 빠져나가 사라진 재생 헤드를 현재 위치에 두고 페이드인
+      // 화면 밖으로 빠져나간 재생 헤드를 현재 위치에 두고 페이드인
       ph.style.transition = 'none'; ph.style.opacity = '0';
       move(); void ph.offsetWidth;
       ph.style.transition = 'opacity .5s ease, box-shadow .5s'; ph.style.opacity = '1';
@@ -1206,21 +1206,20 @@
       var r = tl.getBoundingClientRect(), w = r.width || 1;
       var cx = clips.map(function (c) { return (c.getBoundingClientRect().left - r.left) / w; });
       var tx = tcs.map(function (c) { var b = c.getBoundingClientRect(); return (b.left + b.width / 2 - r.left) / w; });
-      var T1 = 1500, T2 = 380, t0 = performance.now();
+      // 화면 오른쪽 밖(타임코드 라벨까지 완전히 가려지는 지점)까지 멈춤·흐려짐 없이 쭉 이동
+      var qEnd = Math.max(1, ((innerWidth + 120 - r.left) / w - 0.003) / 0.994);
+      var T1 = 1500 * Math.pow(qEnd, 0.6), t0 = performance.now();
       phX = 0;
       requestAnimationFrame(function frame(now) {
-        var t = now - t0, q;
-        if (t < T1) q = ease(t / T1);
-        else if (t < T1 + T2) { var k = (t - T1) / T2; q = 1 + 0.06 * k; ph.style.opacity = (1 - k).toFixed(3); }
-        else { finish(); return; }
+        var t = now - t0;
+        if (t >= T1) { finish(); return; }
+        var q = qEnd * ease(t / T1);
         phX = q;
         var x = 0.003 + q * 0.994;
         setPh(x); setFlip(q > 0.82);
-        tl.style.setProperty('--x', x * 100 + '%');
-        if (t < T1) {
-          cx.forEach(function (v, i) { if (x >= v) clips[i].classList.add('hit'); });
-          tx.forEach(function (v, i) { if (x >= v) tcs[i].classList.add('hit'); });
-        }
+        tl.style.setProperty('--x', Math.min(x, 1) * 100 + '%');
+        cx.forEach(function (v, i) { if (x >= v) clips[i].classList.add('hit'); });
+        tx.forEach(function (v, i) { if (x >= v) tcs[i].classList.add('hit'); });
         var sec = Math.min(q, 1) * 60, s = Math.floor(sec);
         setTc(pad(Math.floor(s / 60)) + ':' + pad(s % 60) + ':' + pad(Math.floor((sec - s) * 30)));
         requestAnimationFrame(frame);
